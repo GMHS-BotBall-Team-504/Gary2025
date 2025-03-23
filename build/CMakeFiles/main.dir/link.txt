@@ -1,0 +1,1 @@
+/usr/bin/docker -Wl,--dependency-file=CMakeFiles/main.dir/link.d CMakeFiles/main.dir/src/main.c.o -o main
