@@ -1,2 +1,3 @@
-#include "../include/variables.h"
-#include "../include/translation.h"
+#include "ports.h"
+#include "translation.h"
+#include "positions.h"

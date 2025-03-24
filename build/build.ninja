@@ -75,7 +75,7 @@ build rebuild_cache: phony CMakeFiles/rebuild_cache.util
 # Custom command for CMakeFiles/botball_user_program
 
 build CMakeFiles/botball_user_program | ${cmake_ninja_workdir}CMakeFiles/botball_user_program: CUSTOM_COMMAND
-  COMMAND = cd /home/oreo/Desktop/spring2025 && docker run -it --rm --volume /home/oreo/Desktop/spring2025/src:/home/kipr:rw --volume /home/oreo/Desktop/spring2025/develop:/home/develop:rw sillyfreak/wombat-cross aarch64-linux-gnu-gcc -Wall /home/oreo/Desktop/spring2025/src/main.c -lkipr -lm -o /home/develop/botball_user_program -lz -lpthread
+  COMMAND = cd /home/oreo/Desktop/spring2025 && docker run -it --rm --volume /home/oreo/Desktop/spring2025/src:/home/kipr:rw --volume /home/oreo/Desktop/spring2025/develop:/home/develop:rw sillyfreak/wombat-cross aarch64-linux-gnu-gcc -Wall /home/oreo/Desktop/spring2025/src/main.c /home/oreo/Desktop/spring2025/src/translation.c /home/oreo/Desktop/spring2025/src/variables.c -lkipr -lm -o /home/develop/botball_user_program -lz -lpthread
   DESC = Building project using Docker
 
 # =============================================================================
