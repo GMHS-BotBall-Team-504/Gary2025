@@ -26,8 +26,6 @@ typedef struct {
     int closedPotato;
 } clawPositions;
 
-
-
 // Declare the global variable for variables
 extern elbowPositions elbowPos;
 extern wristPositions wristPos;
