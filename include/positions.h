@@ -7,6 +7,7 @@ typedef struct {
     int parallelToFloor;
     int vertical;
     int ground;
+    int PVC;
 } elbowPositions;
 
 // Structure for wrist variables
@@ -16,6 +17,7 @@ typedef struct {
     int perpendicularUpwards;
     int perpedincularDownwards;
     int ground;
+    int PVC;
 } wristPositions;
 
 // Structure for claw variables
