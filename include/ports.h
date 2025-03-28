@@ -11,7 +11,7 @@ typedef struct {
 
 // Structure for servo ports
 typedef struct {
-    int elbowHinge;   // Corresponds to port 1
+    int elbow;   // Corresponds to port 1
     int wrist;  // Corresponds to port 0
     int claw;    // Corresponds to port 3
 } servoPorts;
@@ -19,7 +19,7 @@ typedef struct {
 // Structure for analog ports (range)
 typedef struct {
     int underLight;
-} analogPorts;
+} AnalogPorts;
 
 // Structure for digital ports (0, 1)
 typedef struct {
@@ -27,13 +27,13 @@ typedef struct {
     int frontRightButton;
     int backLeftButton;
     int backRightButton;
-} digitalPorts;
+} DigitalPorts;
 
 
 // Declare the global variable for ports
 extern WheelPorts wheels;
 extern servoPorts servos;
-extern analogPorts analog;
-extern digitalPorts digital;
+extern AnalogPorts analogPorts;
+extern DigitalPorts digitalPorts;
 
 #endif // VARIABLES_H

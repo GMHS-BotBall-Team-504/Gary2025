@@ -9,17 +9,17 @@ WheelPorts wheels = {
 };
 
 servoPorts servos = {
-    .elbowHinge = 1,   // Port 1
+    .elbow = 1,   // Port 1
     .wrist = 0, 
     .claw = 2
 };
 
-analogPorts analog = {
+AnalogPorts analogPorts = {
     .underLight = 1,
     
 };
 
-digitalPorts digital = {
+DigitalPorts digitalPorts = {
     .frontLeftButton = 0,
     .frontRightButton = 1,
     .backLeftButton = 2, 

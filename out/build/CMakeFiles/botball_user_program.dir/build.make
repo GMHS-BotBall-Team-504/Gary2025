@@ -56,7 +56,7 @@ EQUALS = =
 CMAKE_SOURCE_DIR = /home/oreo/Desktop/spring2025
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/oreo/Desktop/spring2025/build
+CMAKE_BINARY_DIR = /home/oreo/Desktop/spring2025/out/build
 
 # Utility rule file for botball_user_program.
 
@@ -67,8 +67,8 @@ include CMakeFiles/botball_user_program.dir/compiler_depend.make
 include CMakeFiles/botball_user_program.dir/progress.make
 
 CMakeFiles/botball_user_program:
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/home/oreo/Desktop/spring2025/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building project using Docker"
-	cd /home/oreo/Desktop/spring2025 && docker run -it --rm --volume /home/oreo/Desktop/spring2025/src:/home/kipr:rw --volume /home/oreo/Desktop/spring2025/develop:/home/develop:rw sillyfreak/wombat-cross aarch64-linux-gnu-gcc -Wall /home/oreo/Desktop/spring2025/src/main.c -lkipr -lm -o /home/develop/botball_user_program -lz -lpthread
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/home/oreo/Desktop/spring2025/out/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building project using Docker"
+	cd /home/oreo/Desktop/spring2025 && docker run -it --rm --volume /home/oreo/Desktop/spring2025/src:/home/kipr:rw --volume /home/oreo/Desktop/spring2025/develop:/home/develop:rw sillyfreak/wombat-cross aarch64-linux-gnu-gcc -Wall /home/oreo/Desktop/spring2025/src/main.c /home/oreo/Desktop/spring2025/src/ports.c /home/oreo/Desktop/spring2025/src/positions.c /home/oreo/Desktop/spring2025/src/tasks.c /home/oreo/Desktop/spring2025/src/translation.c -lkipr -lm -o /home/develop/botball_user_program -lz -lpthread
 
 CMakeFiles/botball_user_program.dir/codegen:
 .PHONY : CMakeFiles/botball_user_program.dir/codegen
@@ -86,6 +86,6 @@ CMakeFiles/botball_user_program.dir/clean:
 .PHONY : CMakeFiles/botball_user_program.dir/clean
 
 CMakeFiles/botball_user_program.dir/depend:
-	cd /home/oreo/Desktop/spring2025/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/oreo/Desktop/spring2025 /home/oreo/Desktop/spring2025 /home/oreo/Desktop/spring2025/build /home/oreo/Desktop/spring2025/build /home/oreo/Desktop/spring2025/build/CMakeFiles/botball_user_program.dir/DependInfo.cmake "--color=$(COLOR)"
+	cd /home/oreo/Desktop/spring2025/out/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/oreo/Desktop/spring2025 /home/oreo/Desktop/spring2025 /home/oreo/Desktop/spring2025/out/build /home/oreo/Desktop/spring2025/out/build /home/oreo/Desktop/spring2025/out/build/CMakeFiles/botball_user_program.dir/DependInfo.cmake "--color=$(COLOR)"
 .PHONY : CMakeFiles/botball_user_program.dir/depend
 

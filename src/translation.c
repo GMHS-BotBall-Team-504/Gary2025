@@ -1,6 +1,7 @@
 #include "../include/translation.h"
 #include "../include/ports.h"
-#include "../kipr/wombat.h"
+#include "../include/positions.h"
+#include <kipr/wombat.h>
 #include <pthread.h>
 #include <stdlib.h>
 
@@ -21,12 +22,15 @@ void rotate(int degrees, int speed) {
 // Revamped version of alloff so there's less drift
 void stop(int motorSpeed) {
     for (int i; i < 4; i++) {
-        mav(i, (-1) * motorSpeed);
+        mav(3 - i, (-1) * motorSpeed);
     }
-    msleep(20);
+    msleep(10);
     ao();
 }
 
+void centerDrive(int units, int speed) {
+    
+}
 
 /* ----- Servo Movement ------- */
 
@@ -50,8 +54,17 @@ void startUp() {
     alloff();
     disable_servos();
     msleep(500);
+    servoPosition(servos.claw, clawPos.starting, 1);
+    servoPosition(servos.elbow, elbowPos.starting, 1);
+    servoPosition(servos.wrist, wristPos.starting, 1);
+    for (int i = 0; i < 4; i++) {
+        clear_motor_position_counter(i);
+    }
+    wait_for_light(analogPorts.underLight);
+    shut_down_in(119);
 }
 
+/*
 void* servoThread(void *dataPtr) {
     pthread_t newThread;
     srand(time(NULL));
@@ -60,3 +73,4 @@ void* servoThread(void *dataPtr) {
 
     return NULL;
 }
+*/

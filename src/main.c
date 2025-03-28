@@ -7,13 +7,16 @@
 
 int main() {
     
-    grabPom(1);
+    for (int i = 0; i < 4; i++) {
+        move_relative_position(i, 8000, 1200);
+    }
+    block_motor_done(0);
+    stop(1500);
 
 
-    return 0;
     printf("hello");
     startUp();
 
-    
+    return 0;
 
 }

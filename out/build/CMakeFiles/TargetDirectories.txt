@@ -1,0 +1,3 @@
+/home/oreo/Desktop/spring2025/out/build/CMakeFiles/botball_user_program.dir
+/home/oreo/Desktop/spring2025/out/build/CMakeFiles/edit_cache.dir
+/home/oreo/Desktop/spring2025/out/build/CMakeFiles/rebuild_cache.dir

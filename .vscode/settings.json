@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "stdio.h": "c",
-        "translation.h": "c"
+        "translation.h": "c",
+        "fstream": "c"
     }
 }
