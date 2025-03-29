@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "name": "Run Shell Script",
+            "type": "process",
+            "request": "launch",
+            "command": "/bin/bash",
+            "args": [
+                "${workspaceFolder}/send.sh"
+            ],
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}

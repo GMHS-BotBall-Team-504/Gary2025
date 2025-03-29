@@ -5,8 +5,8 @@
 #include <kipr/wombat.h>
 
 void grabPom(int version) {
-    if (get_servo_position(servos.elbowHinge) != elbowPos.parallelToFloor) {
-        servoPosition(servos.elbowHinge, elbowPos.parallelToFloor, 1);
+    if (get_servo_position(servos.elbow) != elbowPos.parallelToFloor) {
+        servoPosition(servos.elbow, elbowPos.parallelToFloor, 1);
     }
     if (get_servo_position(servos.wrist) != wristPos.ground) {
         servoPosition(servos.wrist, wristPos.ground, 1);
@@ -17,7 +17,7 @@ void grabPom(int version) {
         servoPosition(servos.claw, clawPos.closedPoms, 1);
 
         // Run both the elbow, wrist, and rotation thread
-        servoPosition(servos.elbowHinge, elbowPos.PVC, 1);
+        servoPosition(servos.elbow, elbowPos.PVC, 1);
         servoPosition(servos.wrist, wristPos.PVC, 1);
 
 
