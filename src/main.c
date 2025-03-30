@@ -2,8 +2,9 @@
 #include <stdio.h>
 #include <pthread.h>
 #include <stdlib.h>
+#include "../include/library.h"
 #define startingDirection 180
-#define sum 1960
+#define sum 2450
 
 // Struct to hold parameters for servoPosition
 typedef struct {
@@ -24,7 +25,7 @@ void* servoThread(void* dataPtr) {
     pthread_barrier_wait(&servoBarrier);
 
     // Determine the direction of movement
-    int step = (params->endPosition > params->startPosition) ? 8 : -8; // Step size
+    int step = (params->endPosition > params->startPosition) ? 15 : -15; // Step size
     int currentPosition = params->startPosition;
 
     // Gradually move the servo to the target position
@@ -67,30 +68,34 @@ void runServoThreads(ServoParams params[], int numServos) {
 }
 
 int main() {
-    enable_servos();
-
-    // Example 1: Move three servos to the first set of positions gradually
-    printf("Moving to first positions gradually...\n");
-    runServoThreads((ServoParams[]) {
-        {3, get_servo_position(3), 350, 5},
-        {2, get_servo_position(2), sum - 350, 5},
-        {1, get_servo_position(1), 200, 5}
-    }, 3); // Pass an anonymous array and the number of servos
+    
+    // enable_servos();
+    forwardDrive(10000, 1500);
+    msleep(2000);
+    forwardDrive(-10000, 1500);
     msleep(1000);
+    // // Example 1: Move three servos to the first set of positions gradually
+    // printf("Moving to first positions gradually...\n");
+    // runServoThreads((ServoParams[]) {
+    //     {3, get_servo_position(3), 1600, 2},
+    //     {2, get_servo_position(2), sum - 1600, 2},
+    //     {1, get_servo_position(1), 200, 5}
+    // }, 3); // Pass an anonymous array and the number of servos
+    // msleep(1500);
 
-    // Example 2: Move three servos to the second set of positions gradually
-    printf("Moving to second positions gradually...\n");
-    runServoThreads((ServoParams[]) {
-        {3, get_servo_position(3), 1786, 5},
-        {2, get_servo_position(2), sum - 1786, 5},
-        {1, get_servo_position(1), 1600, 5}
-    }, 3); // Pass another anonymous array and the number of servos
-    msleep(600);
+    // // Example 2: Move three servos to the second set of positions gradually
+    // printf("Moving to second positions gradually...\n");
+    // runServoThreads((ServoParams[]) {
+    //     {3, get_servo_position(3), 600, 2},
+    //     {2, get_servo_position(2), sum - 600, 2},
+    //     {1, get_servo_position(1), 2000, 5}
+    // }, 3); // Pass another anonymous array and the number of servos
+    // msleep(600);
 
-    set_servo_position(0, 150);
-    msleep(300);
-    set_servo_position(0, 1300);
-    msleep(300);
-    disable_servos();
+    // set_servo_position(0, 150);
+    // msleep(300);
+    // set_servo_position(0, 1300);
+    // msleep(300);
+    // disable_servos();
     return 0;
 }

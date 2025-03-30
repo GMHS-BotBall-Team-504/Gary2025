@@ -13,6 +13,5 @@ void servoPosition(int port, int position, int iterations);
 
 
 void startUp();
-void *servoThread(void *dataPtr); 
 
 #endif // TRANSLATION_H

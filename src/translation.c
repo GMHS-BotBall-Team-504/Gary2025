@@ -4,14 +4,17 @@
 #include <kipr/wombat.h>
 #include <pthread.h>
 #include <stdlib.h>
+#define constant 0.966
 
 /* ----- Translational Movement ----- */
 
 void forwardDrive(int units, int speed) {
-    for (int i = 0; i < 4; i++) {
-        move_relative_position(i, units, speed);
-    }
+    move_relative_position(wheels.frontLeft, speed, units);
+    move_relative_position(wheels.backLeft, speed, units);
+    move_relative_position(wheels.frontRight, constant * speed, constant * units);
+    move_relative_position(wheels.backRight, constant * speed, constant * units);
     block_motor_done(0);
+    msleep(10);
     stop(speed);
 }
 
@@ -21,10 +24,10 @@ void rotate(int degrees, int speed) {
 
 // Revamped version of alloff so there's less drift
 void stop(int motorSpeed) {
-    for (int i; i < 4; i++) {
-        mav(3 - i, (-1) * motorSpeed);
+    for (int i = 0; i < 4; i++) {
+        mav(i, (-1) * motorSpeed);
     }
-    msleep(10);
+    msleep(30);
     ao();
 }
 
@@ -63,14 +66,3 @@ void startUp() {
     wait_for_light(analogPorts.underLight);
     shut_down_in(119);
 }
-
-/*
-void* servoThread(void *dataPtr) {
-    pthread_t newThread;
-    srand(time(NULL));
-
-    pthread_create(&newThread, NULL, servoPosition, dataPtr);
-
-    return NULL;
-}
-*/
