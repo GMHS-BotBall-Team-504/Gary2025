@@ -69,31 +69,29 @@ void runServoThreads(ServoParams params[], int numServos) {
 
 int main() {
     
-    // enable_servos();
-    rotate(5000, 1500);
-    msleep(1000);
-    // // Example 1: Move three servos to the first set of positions gradually
-    // printf("Moving to first positions gradually...\n");
-    // runServoThreads((ServoParams[]) {
-    //     {3, get_servo_position(3), 1600, 2},
-    //     {2, get_servo_position(2), sum - 1600, 2},
-    //     {1, get_servo_position(1), 200, 5}
-    // }, 3); // Pass an anonymous array and the number of servos
-    // msleep(1500);
+    enable_servos();
+    // Example 1: Move three servos to the first set of positions gradually
+    printf("Moving to first positions gradually...\n");
+    runServoThreads((ServoParams[]) {
+        {3, get_servo_position(3), 1600, 2},
+        {2, get_servo_position(2), sum - 1600, 2},
+        {1, get_servo_position(1), 200, 5}
+    }, 3); // Pass an anonymous array and the number of servos
+    msleep(1500);
 
-    // // Example 2: Move three servos to the second set of positions gradually
-    // printf("Moving to second positions gradually...\n");
-    // runServoThreads((ServoParams[]) {
-    //     {3, get_servo_position(3), 600, 2},
-    //     {2, get_servo_position(2), sum - 600, 2},
-    //     {1, get_servo_position(1), 2000, 5}
-    // }, 3); // Pass another anonymous array and the number of servos
-    // msleep(600);
+    // Example 2: Move three servos to the second set of positions gradually
+    printf("Moving to second positions gradually...\n");
+    runServoThreads((ServoParams[]) {
+        {3, get_servo_position(3), 600, 2},
+        {2, get_servo_position(2), sum - 600, 2},
+        {1, get_servo_position(1), 2000, 5}
+    }, 3); // Pass another anonymous array and the number of servos
+    msleep(600);
 
-    // set_servo_position(0, 150);
-    // msleep(300);
-    // set_servo_position(0, 1300);
-    // msleep(300);
-    // disable_servos();
+    set_servo_position(0, 150);
+    msleep(300);
+    set_servo_position(0, 1300);
+    msleep(300);
+    disable_servos();
     return 0;
 }

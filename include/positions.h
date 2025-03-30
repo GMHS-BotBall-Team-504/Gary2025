@@ -22,7 +22,6 @@ typedef struct {
 
 // Structure for claw variables
 typedef struct {
-    int starting;
     int open;
     int closedPoms;
     int closedPotato;

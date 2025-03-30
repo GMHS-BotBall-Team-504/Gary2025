@@ -3,30 +3,30 @@
 
 // Structure for wheel ports
 typedef struct {
-    int frontLeft;   // Corresponds to port 1
+    int frontLeft;   // Corresponds to port 3
     int frontRight;  // Corresponds to port 0
-    int backLeft;    // Corresponds to port 3
-    int backRight;   // Corresponds to port 2
+    int backLeft;    // Corresponds to port 2
+    int backRight;   // Corresponds to port 1
 } WheelPorts;
 
 // Structure for servo ports
 typedef struct {
-    int elbow;   // Corresponds to port 1
-    int wrist;  // Corresponds to port 0
-    int claw;    // Corresponds to port 3
+    int shoulder; // Port 0
+    int elbow;   // Port 1
+    int wrist;  // Port 2
+    int claw;    // Port 3
 } servoPorts;
 
 // Structure for analog ports (range)
 typedef struct {
     int underLight;
+    int leftRange;
+    int rightRange;
 } AnalogPorts;
 
 // Structure for digital ports (0, 1)
 typedef struct {
-    int frontLeftButton;
-    int frontRightButton;
-    int backLeftButton;
-    int backRightButton;
+    
 } DigitalPorts;
 
 
