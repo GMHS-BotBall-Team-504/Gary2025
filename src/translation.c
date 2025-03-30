@@ -18,8 +18,25 @@ void forwardDrive(int units, int speed) {
     stop(speed);
 }
 
+void backwardDrive(int units, int speed) {
+    move_relative_position(wheels.frontLeft, -1 * speed, -1 * units);
+    move_relative_position(wheels.backLeft, -1 * speed, -1 * units);
+    move_relative_position(wheels.frontRight, -1 * constant * speed, -1 * constant * units);
+    move_relative_position(wheels.backRight, -1 * constant * speed, -1 * constant * units);
+    block_motor_done(0);
+    msleep(10);
+    stop(speed);
+}
 void rotate(int degrees, int speed) {
-
+    move_relative_position(wheels.frontLeft, speed, degrees);
+    move_relative_position(wheels.backLeft, speed, degrees);
+    move_relative_position(wheels.frontRight, -1 * speed, -1 * degrees);
+    move_relative_position(wheels.backRight, -1 * speed, -1 * degrees);
+    for (int i = 0; i < 4; i++) {
+        block_motor_done(i);
+    }
+    msleep(10);
+    
 }
 
 // Revamped version of alloff so there's less drift

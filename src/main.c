@@ -70,9 +70,7 @@ void runServoThreads(ServoParams params[], int numServos) {
 int main() {
     
     // enable_servos();
-    forwardDrive(10000, 1500);
-    msleep(2000);
-    forwardDrive(-10000, 1500);
+    rotate(5000, 1500);
     msleep(1000);
     // // Example 1: Move three servos to the first set of positions gradually
     // printf("Moving to first positions gradually...\n");
