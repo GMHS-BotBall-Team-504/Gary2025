@@ -1,0 +1,7 @@
+.vscode
+build
+kipr
+node_modules
+out
+CMakeLists.txt
+yarn.lock
