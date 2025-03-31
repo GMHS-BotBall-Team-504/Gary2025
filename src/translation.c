@@ -1,6 +1,7 @@
 #include "../include/translation.h"
 #include "../include/ports.h"
 #include "../include/positions.h"
+#include "../include/servos.h"
 #include <kipr/wombat.h>
 #include <pthread.h>
 #include <stdlib.h>
@@ -16,6 +17,7 @@ void forwardDrive(int units, int speed) {
     block_motor_done(0);
     msleep(10);
     stop(speed);
+    return;
 }
 
 void backwardDrive(int units, int speed) {
@@ -27,6 +29,7 @@ void backwardDrive(int units, int speed) {
     msleep(10);
     stop(speed);
 }
+
 void rotate(int degrees, int speed) {
     move_relative_position(wheels.frontLeft, speed, degrees);
     move_relative_position(wheels.backLeft, speed, degrees);
@@ -68,18 +71,67 @@ void servoPosition(int port, int position, int iterations) {
 
 }
 
+void openClaw() {
+    enable_servo(servos.claw);
+    set_servo_position(servos.claw, clawPos.open);
+    msleep(500);
+    disable_servo(servos.claw);
+}
+
+void closeClaw(int position) {
+    enable_servo(servos.claw);
+    if (position == 0) {
+        set_servo_position(servos.claw, clawPos.closedPoms);
+    }
+    else {
+        set_servo_position(servos.claw, clawPos.closedPotato);
+    }
+    msleep(500);
+    disable_servo(servos.claw);
+}
+
+// We assume the robot is in the ground position
+void verticalArm() {
+    // turn on the necessary servos
+    enable_servos();
+    disable_servo(servos.claw);
+
+    // enable the counterweight
+    runServoThreads((ServoParams[]) {
+        {servos.elbow, get_servo_position(servos.elbow), 200, 20},
+        {servos.wrist, get_servo_position(servos.wrist), wristPos.perpendicularUpwards, 20}
+    }, 2);
+    msleep(200);
+
+    // slowly move everything up
+    runServoThreads((ServoParams[]) {
+        {servos.shoulder, get_servo_position(servos.shoulder), shoulderPos.vertical, 50},
+        {servos.elbow, get_servo_position(servos.elbow), 720, 70}, // 218
+        {servos.wrist, get_servo_position(servos.wrist), 750, 70}
+    }, 3);
+    msleep(200);
+
+    runServoThreads((ServoParams[]) {
+        {servos.elbow, get_servo_position(servos.elbow), 1600, 30}, // 
+        {servos.wrist, get_servo_position(servos.wrist), 710, 30}
+    }, 2);
+    msleep(200);
+    printf("moved the arm up\n");
+    return;
+}
+
 
 // Ran during the 1 minute before games start
-void startUp() {
-    alloff();
-    disable_servos();
-    msleep(500);
-    servoPosition(servos.claw, clawPos.starting, 1);
-    servoPosition(servos.elbow, elbowPos.starting, 1);
-    servoPosition(servos.wrist, wristPos.starting, 1);
-    for (int i = 0; i < 4; i++) {
-        clear_motor_position_counter(i);
-    }
-    wait_for_light(analogPorts.underLight);
-    shut_down_in(119);
-}
+// void startUp() {
+//     alloff();
+//     disable_servos();
+//     msleep(500);
+//     servoPosition(servos.claw, clawPos.starting, 1);
+//     servoPosition(servos.elbow, elbowPos.starting, 1);
+//     servoPosition(servos.wrist, wristPos.starting, 1);
+//     for (int i = 0; i < 4; i++) {
+//         clear_motor_position_counter(i);
+//     }
+//     wait_for_light(analogPorts.underLight);
+//     shut_down_in(119);
+// }
