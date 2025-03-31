@@ -21,7 +21,7 @@ wristPositions wristPos = {
     .parallelToArm = 664,
     .perpendicularUpwards = 0,
     .perpedincularDownwards = 1776,
-    .ground = 538,
+    .ground = 650,
     .PVC = 585
 };
 

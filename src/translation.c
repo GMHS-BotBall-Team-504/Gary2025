@@ -98,17 +98,23 @@ void verticalArm() {
 
     // enable the counterweight
     runServoThreads((ServoParams[]) {
-        {servos.elbow, get_servo_position(servos.elbow), 20, 2},
-        {servos.wrist, get_servo_position(servos.wrist), wristPos.perpendicularUpwards, 2}
+        {servos.elbow, get_servo_position(servos.elbow), 200, 20},
+        {servos.wrist, get_servo_position(servos.wrist), wristPos.perpendicularUpwards, 20}
     }, 2);
     msleep(200);
 
     // slowly move everything up
     runServoThreads((ServoParams[]) {
         {servos.shoulder, get_servo_position(servos.shoulder), shoulderPos.vertical, 50},
-        {servos.elbow, get_servo_position(servos.elbow), 720, 72}, // 218
-        {servos.wrist, get_servo_position(servos.wrist), 1000, 72}
+        {servos.elbow, get_servo_position(servos.elbow), 720, 70}, // 218
+        {servos.wrist, get_servo_position(servos.wrist), 750, 70}
     }, 3);
+    msleep(200);
+
+    runServoThreads((ServoParams[]) {
+        {servos.elbow, get_servo_position(servos.elbow), 1600, 30}, // 
+        {servos.wrist, get_servo_position(servos.wrist), 710, 30}
+    }, 2);
     msleep(200);
     printf("moved the arm up\n");
     return;
