@@ -1,6 +1,7 @@
 #include "../include/translation.h"
 #include "../include/ports.h"
 #include "../include/positions.h"
+#include "../include/servos.h"
 #include <kipr/wombat.h>
 #include <pthread.h>
 #include <stdlib.h>
@@ -16,6 +17,7 @@ void forwardDrive(int units, int speed) {
     block_motor_done(0);
     msleep(10);
     stop(speed);
+    return;
 }
 
 void backwardDrive(int units, int speed) {
@@ -27,6 +29,7 @@ void backwardDrive(int units, int speed) {
     msleep(10);
     stop(speed);
 }
+
 void rotate(int degrees, int speed) {
     move_relative_position(wheels.frontLeft, speed, degrees);
     move_relative_position(wheels.backLeft, speed, degrees);
@@ -85,6 +88,30 @@ void closeClaw(int position) {
     }
     msleep(500);
     disable_servo(servos.claw);
+}
+
+// We assume the robot is in the ground position
+void verticalArm() {
+    // turn on the necessary servos
+    enable_servos();
+    disable_servo(servos.claw);
+
+    // enable the counterweight
+    runServoThreads((ServoParams[]) {
+        {servos.elbow, get_servo_position(servos.elbow), 20, 2},
+        {servos.wrist, get_servo_position(servos.wrist), wristPos.perpendicularUpwards, 2}
+    }, 2);
+    msleep(200);
+
+    // slowly move everything up
+    runServoThreads((ServoParams[]) {
+        {servos.shoulder, get_servo_position(servos.shoulder), shoulderPos.vertical, 50},
+        {servos.elbow, get_servo_position(servos.elbow), 720, 72}, // 218
+        {servos.wrist, get_servo_position(servos.wrist), 1000, 72}
+    }, 3);
+    msleep(200);
+    printf("moved the arm up\n");
+    return;
 }
 
 

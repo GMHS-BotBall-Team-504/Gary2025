@@ -13,6 +13,7 @@ void centerDrive(int units, int speed);
 void servoPosition(int port, int position, int iterations);
 void openClaw();
 void closeClaw(int position);
+void verticalArm();
 
 void startUp();
 
