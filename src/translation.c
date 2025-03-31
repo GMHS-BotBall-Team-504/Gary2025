@@ -68,18 +68,37 @@ void servoPosition(int port, int position, int iterations) {
 
 }
 
+void openClaw() {
+    enable_servo(servos.claw);
+    set_servo_position(servos.claw, clawPos.open);
+    msleep(500);
+    disable_servo(servos.claw);
+}
+
+void closeClaw(int position) {
+    enable_servo(servos.claw);
+    if (position == 0) {
+        set_servo_position(servos.claw, clawPos.closedPoms);
+    }
+    else {
+        set_servo_position(servos.claw, clawPos.closedPotato);
+    }
+    msleep(500);
+    disable_servo(servos.claw);
+}
+
 
 // Ran during the 1 minute before games start
-void startUp() {
-    alloff();
-    disable_servos();
-    msleep(500);
-    servoPosition(servos.claw, clawPos.starting, 1);
-    servoPosition(servos.elbow, elbowPos.starting, 1);
-    servoPosition(servos.wrist, wristPos.starting, 1);
-    for (int i = 0; i < 4; i++) {
-        clear_motor_position_counter(i);
-    }
-    wait_for_light(analogPorts.underLight);
-    shut_down_in(119);
-}
+// void startUp() {
+//     alloff();
+//     disable_servos();
+//     msleep(500);
+//     servoPosition(servos.claw, clawPos.starting, 1);
+//     servoPosition(servos.elbow, elbowPos.starting, 1);
+//     servoPosition(servos.wrist, wristPos.starting, 1);
+//     for (int i = 0; i < 4; i++) {
+//         clear_motor_position_counter(i);
+//     }
+//     wait_for_light(analogPorts.underLight);
+//     shut_down_in(119);
+// }

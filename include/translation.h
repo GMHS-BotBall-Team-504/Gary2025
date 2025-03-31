@@ -11,7 +11,8 @@ void centerDrive(int units, int speed);
 /* ----- Servo Movement ------- */
 
 void servoPosition(int port, int position, int iterations);
-
+void openClaw();
+void closeClaw(int position);
 
 void startUp();
 

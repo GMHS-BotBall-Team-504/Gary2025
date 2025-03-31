@@ -1,11 +1,20 @@
 #ifndef POSITIONS_H
 #define POSITIONS_H
 
+// Structure for shoulder variables
+typedef struct {
+    int starting;
+    int parallelToGround;
+    int vertical;
+    int ground;
+    int PVC;
+} shoulderPositions;
+
 // Structure for elbow variables
 typedef struct {
     int starting;
-    int parallelToFloor;
-    int vertical;
+    int parallelToShoulder;
+    int perpendicularToShoulder;
     int ground;
     int PVC;
 } elbowPositions;
@@ -28,6 +37,7 @@ typedef struct {
 } clawPositions;
 
 // Declare the global variable for variables
+extern shoulderPositions shoulderPos;
 extern elbowPositions elbowPos;
 extern wristPositions wristPos;
 extern clawPositions clawPos;
