@@ -38,6 +38,7 @@ void* servoThread(void* dataPtr) {
 
 // Function to run servo threads with gradual movement
 void runServoThreads(ServoParams params[], int numServos) {
+    enable_servos(); // Enable servos before starting threads
     pthread_t threads[3]; // Array to hold thread IDs (up to 3)
 
     // Initialize the barrier for the number of servos
@@ -55,4 +56,6 @@ void runServoThreads(ServoParams params[], int numServos) {
 
     // Destroy the barrier
     pthread_barrier_destroy(&servoBarrier);
+    disable_servos(); // Disable servos after movement
+    return;
 }
