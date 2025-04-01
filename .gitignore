@@ -5,3 +5,5 @@ node_modules
 out
 CMakeLists.txt
 yarn.lock
+execution/*
+execution/botball_user_program

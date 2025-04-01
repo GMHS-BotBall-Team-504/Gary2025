@@ -42,6 +42,12 @@ void* runServoThreadsWrapper(void* arg) {
     return NULL;
 }
 
+void* verticalArmWrapper(void* arg) {
+    printf("moving upwards\n");
+    verticalArm();
+    return NULL;
+}
+
 void executeMovementandServoThreads(void* (*motorThreadFunc)(void*), int motorParams[], ServoThreadArgs* servoArgs) {
     pthread_t motorThread, servoThread; // Declare thread variables locally
 

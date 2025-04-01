@@ -11,6 +11,7 @@ void* backwardDriveThread(void* arg);
 void* rotateThread(void* arg);
 
 void* runServoThreadsWrapper(void* arg);
+void* verticalArmWrapper(void* arg);
 void executeMovementandServoThreads(void* (*motorThreadFunc)(void*), int motorParams[], ServoThreadArgs* servoArgs);
 
 #endif // THREADS_H

@@ -28,41 +28,50 @@ int main() {
 
     // /* ------------- MOVEMENT AND SERVO CODE -------------- */
 
-    // runServoThreads((ServoParams[]) {
-    //     {servos.shoulder, shoulderPos.ground, 2},
-    //     {servos.elbow, elbowPos.ground, 2},
-    //     {servos.wrist, wristPos.ground, 2}
-    // }, 3);
+    runServoThreads((ServoParams[]) {
+        {servos.shoulder, shoulderPos.ground, 2},
+        {servos.elbow, elbowPos.ground, 2},
+        {servos.wrist, wristPos.ground, 2}
+    }, 3);
 
-    // {
-    //     int motorParams[] = {1500, 1500};
-    //     ServoThreadArgs servoArgs = {
-    //         (ServoParams[]) {
-    //         }, 0
-    //     };
+    {
+        int motorParams[] = {1500, 1500};
+        ServoThreadArgs servoArgs = {
+            (ServoParams[]) {
+            }, 0
+        };
 
-    //     // Execute threads
-    //     executeMovementandServoThreads(forwardDriveThread, motorParams, &servoArgs);
-    // }
+        // Execute threads
+        executeMovementandServoThreads(forwardDriveThread, motorParams, &servoArgs);
+    }
 
-    // closeClaw(0); // To close around poms size
-    // msleep(20);
+    closeClaw(0); // To close around poms size
+    msleep(20);
     
-    // {
-    //     int motorParams[] = {1500, 1500};
-    //     ServoThreadArgs servoArgs = {
-    //         (ServoParams[]) {
-    //             {servos.elbow, elbowPos.PVC, 20},
-    //             {servos.wrist, wristPos.PVC, 20}
-    //         }, 2
-    //     };
+    {
+        int motorParams[] = {1500, 1500};
+        ServoThreadArgs servoArgs = {
+            (ServoParams[]) {
+                {servos.elbow, elbowPos.PVC, 20},
+                {servos.wrist, wristPos.PVC, 20}
+            }, 2
+        };
 
-    //     // Execute threads
-    //     executeMovementandServoThreads(backwardDriveThread ,motorParams, &servoArgs);
-    // }
+        // Execute threads
+        executeMovementandServoThreads(backwardDriveThread ,motorParams, &servoArgs);
+    }
 
-    // msleep(50);
-    // openClaw();
+    {
+        int motorParams[] = {1500, 1500};
+        ServoThreadArgs servoArgs = {
+            (ServoParams[]) {}, 2
+        };
+
+        executeMovementandServoThreads(verticalArmWrapper, motorParams, &servoArgs);
+    }
+
+    msleep(50);
+    openClaw();
     
     verticalArm();
 
