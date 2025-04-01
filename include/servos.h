@@ -4,7 +4,6 @@
 // Struct to hold parameters for servoPosition
 typedef struct {
     int port;
-    int startPosition;
     int endPosition;
     int stepDelay;
 } ServoParams;

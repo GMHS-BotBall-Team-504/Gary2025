@@ -14,9 +14,10 @@ void* servoThread(void* dataPtr) {
     // Wait at the barrier until all threads are ready
     pthread_barrier_wait(&servoBarrier);
 
+    int startPosition = get_servo_position(params->port);
     // Determine the direction of movement
-    int step = (params->endPosition > params->startPosition) ? 15 : -15; // Step size
-    int currentPosition = params->startPosition;
+    int step = (params->endPosition > startPosition) ? 15 : -15; // Step size
+    int currentPosition = startPosition;
 
     // Gradually move the servo to the target position
     while ((step > 0 && currentPosition < params->endPosition) || 

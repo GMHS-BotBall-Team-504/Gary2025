@@ -7,7 +7,10 @@ typedef struct {
 } ServoThreadArgs;
 
 void* forwardDriveThread(void* arg);
+void* backwardDriveThread(void* arg);
+void* rotateThread(void* arg);
+
 void* runServoThreadsWrapper(void* arg);
-void executeMovementandServoThreads(int motorParams[], ServoThreadArgs* servoArgs);
+void executeMovementandServoThreads(void* (*motorThreadFunc)(void*), int motorParams[], ServoThreadArgs* servoArgs);
 
 #endif // THREADS_H
