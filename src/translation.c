@@ -30,6 +30,16 @@ void backwardDrive(int units, int speed) {
     stop(speed);
 }
 
+void rightDrive(int units, int speed) {
+    move_relative_position(wheels.frontLeft, -1 * speed, -1 * units);
+    move_relative_position(wheels.backLeft, 1 * speed, 1 * units);
+    move_relative_position(wheels.frontRight, 1 * speed, 1 * units);
+    move_relative_position(wheels.backRight, -1 * speed, -1 * units);
+    block_motor_done(0);
+    msleep(10);
+    ao();
+}
+
 void rotate(int degrees, int speed) {
     move_relative_position(wheels.frontLeft, speed, degrees);
     move_relative_position(wheels.backLeft, speed, degrees);
@@ -76,6 +86,7 @@ void openClaw() {
     set_servo_position(servos.claw, clawPos.open);
     msleep(500);
     disable_servo(servos.claw);
+    printf("opened claw\n");
 }
 
 void closeClaw(int position) {
@@ -101,19 +112,20 @@ void verticalArm() {
         {servos.elbow, 200, 12},
         {servos.wrist, wristPos.perpendicularUpwards, 12}
     }, 2);
-
+    disable_servo(servos.claw);
     // slowly move everything up
     runServoThreads((ServoParams[]) {
         {servos.shoulder, shoulderPos.vertical, 30},
         {servos.elbow, 720, 45}, // 218
         {servos.wrist, 650, 45}
     }, 3);
-
+    disable_servo(servos.claw);
     runServoThreads((ServoParams[]) {
         {servos.elbow, 1600, 10}, // 
         {servos.wrist, 710, 10}
     }, 2);
     msleep(200);
+    closeClaw(0);
     printf("moved the arm up\n");
     return;
 }
@@ -128,6 +140,13 @@ void startUp() {
     for (int i = 0; i < 4; i++) {
         clear_motor_position_counter(i);
     }
+    verticalArm();
+    runServoThreads((ServoParams[]) {
+        {servos.shoulder, shoulderPos.starting, 30},
+        {servos.elbow, elbowPos.starting, 30},
+        {servos.wrist, wristPos.starting, 30}
+    }, 3);
+
     // wait_for_light(analogPorts.underLight);
     // shut_down_in(119);
     return;

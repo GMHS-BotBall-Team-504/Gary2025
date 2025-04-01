@@ -1,32 +1,32 @@
 #include "../include/positions.h"
 
 shoulderPositions shoulderPos = {
-    .starting = 1323,
+    .starting = 1800,
     .parallelToGround = 640,
     .vertical = 1655,
-    .ground = 722,
+    .ground = 629,
     .PVC = 934
 };
 
 elbowPositions elbowPos = {
-    .starting = 918,
+    .starting = 500,
     .parallelToShoulder = 1400,
     .perpendicularToShoulder = 400,
-    .ground = 1580,
-    .PVC = 1012
+    .ground = 1452,
+    .PVC = 968
 };
 
 wristPositions wristPos = {
-    .starting = 120,
+    .starting = 0,
     .parallelToArm = 664,
     .perpendicularUpwards = 0,
     .perpedincularDownwards = 1776,
-    .ground = 650,
-    .PVC = 1034
+    .ground = 589,
+    .PVC = 898
 };
 
 clawPositions clawPos = {
-    .open = 78,
-    .closedPoms = 1200,
-    .closedPotato = 1078
+    .open = 200,
+    .closedPoms = 1600,
+    .closedPotato = 1300
 };
