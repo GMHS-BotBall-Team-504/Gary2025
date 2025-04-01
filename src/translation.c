@@ -98,22 +98,20 @@ void verticalArm() {
 
     // enable the counterweight
     runServoThreads((ServoParams[]) {
-        {servos.elbow, get_servo_position(servos.elbow), 200, 20},
-        {servos.wrist, get_servo_position(servos.wrist), wristPos.perpendicularUpwards, 20}
+        {servos.elbow, 200, 12},
+        {servos.wrist, wristPos.perpendicularUpwards, 12}
     }, 2);
-    msleep(200);
 
     // slowly move everything up
     runServoThreads((ServoParams[]) {
-        {servos.shoulder, get_servo_position(servos.shoulder), shoulderPos.vertical, 50},
-        {servos.elbow, get_servo_position(servos.elbow), 720, 70}, // 218
-        {servos.wrist, get_servo_position(servos.wrist), 750, 70}
+        {servos.shoulder, shoulderPos.vertical, 30},
+        {servos.elbow, 720, 45}, // 218
+        {servos.wrist, 650, 45}
     }, 3);
-    msleep(200);
 
     runServoThreads((ServoParams[]) {
-        {servos.elbow, get_servo_position(servos.elbow), 1600, 30}, // 
-        {servos.wrist, get_servo_position(servos.wrist), 710, 30}
+        {servos.elbow, 1600, 10}, // 
+        {servos.wrist, 710, 10}
     }, 2);
     msleep(200);
     printf("moved the arm up\n");
@@ -122,16 +120,15 @@ void verticalArm() {
 
 
 // Ran during the 1 minute before games start
-// void startUp() {
-//     alloff();
-//     disable_servos();
-//     msleep(500);
-//     servoPosition(servos.claw, clawPos.starting, 1);
-//     servoPosition(servos.elbow, elbowPos.starting, 1);
-//     servoPosition(servos.wrist, wristPos.starting, 1);
-//     for (int i = 0; i < 4; i++) {
-//         clear_motor_position_counter(i);
-//     }
-//     wait_for_light(analogPorts.underLight);
-//     shut_down_in(119);
-// }
+void startUp() {
+    alloff();
+    disable_servos();
+    msleep(500);
+
+    for (int i = 0; i < 4; i++) {
+        clear_motor_position_counter(i);
+    }
+    // wait_for_light(analogPorts.underLight);
+    // shut_down_in(119);
+    return;
+}

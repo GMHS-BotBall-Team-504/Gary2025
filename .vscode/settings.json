@@ -5,7 +5,8 @@
         "fstream": "c",
         "library.h": "c",
         "positions.h": "c",
-        "wombat.h": "c"
+        "wombat.h": "c",
+        "random": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

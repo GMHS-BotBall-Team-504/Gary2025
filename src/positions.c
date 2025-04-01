@@ -5,7 +5,7 @@ shoulderPositions shoulderPos = {
     .parallelToGround = 640,
     .vertical = 1655,
     .ground = 722,
-    .PVC = 900
+    .PVC = 934
 };
 
 elbowPositions elbowPos = {
@@ -13,7 +13,7 @@ elbowPositions elbowPos = {
     .parallelToShoulder = 1400,
     .perpendicularToShoulder = 400,
     .ground = 1580,
-    .PVC = 1500
+    .PVC = 1012
 };
 
 wristPositions wristPos = {
@@ -22,11 +22,11 @@ wristPositions wristPos = {
     .perpendicularUpwards = 0,
     .perpedincularDownwards = 1776,
     .ground = 650,
-    .PVC = 585
+    .PVC = 1034
 };
 
 clawPositions clawPos = {
     .open = 78,
-    .closedPoms = 1300,
+    .closedPoms = 1200,
     .closedPotato = 1078
 };
