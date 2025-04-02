@@ -26,7 +26,7 @@ wristPositions wristPos = {
 };
 
 clawPositions clawPos = {
-    .open = 200,
-    .closedPoms = 1600,
-    .closedPotato = 1300
+    .open = 100,
+    .closedPoms = 1350,
+    .closedPotato = 1200
 };

@@ -9,6 +9,10 @@
 
 /* ----- Translational Movement ----- */
 
+/// @brief Moves the robot forward
+/// @param units Target ticks traveled
+/// @param speed Speed in ticks/s
+/// @details The robot will move forward at the given speed for the given number of ticks
 void forwardDrive(int units, int speed) {
     move_relative_position(wheels.frontLeft, speed, units);
     move_relative_position(wheels.backLeft, speed, units);
@@ -40,6 +44,34 @@ void rightDrive(int units, int speed) {
     ao();
 }
 
+/// @brief Translates the robot in any direction; 360 degrees; Cannot rotate
+/// @param distance Target cm traveled
+/// @param radians Angle in radians to turn
+/// @param speed Speed in cm/s
+void angleDrive(int distance, int degrees, int speed) {
+    // Converting degrees into radians
+    float radians = degrees * M_PI / 180;
+
+    int topRight = sin(radians - M_PI/4) * speed;
+    int topLeft = sin(radians + M_PI/4) * speed;
+
+    move_relative_position(wheels.frontLeft, topLeft, distance);
+    move_relative_position(wheels.backLeft, topRight, distance);
+    move_relative_position(wheels.frontRight, topRight, distance);
+    move_relative_position(wheels.backRight, topLeft, distance);
+
+    for (int i = 0; i < 4; i++) {
+        block_motor_done(i);
+    }
+    msleep(10);
+    return;
+}
+
+/// @brief
+void rotationalDrive(int distance, int directionsRadians, int turningRadians, int rotationalSpeed, int translationalSpeed) {
+
+}
+
 void rotate(int degrees, int speed) {
     move_relative_position(wheels.frontLeft, speed, degrees);
     move_relative_position(wheels.backLeft, speed, degrees);
@@ -61,8 +93,42 @@ void stop(int motorSpeed) {
     ao();
 }
 
-void centerDrive(int units, int speed) {
-    
+void centerDrive(int targetDistance, int baseSpeed, int kp) {
+    int leftDistance, rightDistance, error, correction;
+    int traveledDistance = 0;
+
+    // Reset motor position counters
+    for (int i = 0; i < 4; i++) {
+        clear_motor_position_counter(i);
+    }
+
+    while (traveledDistance < targetDistance) {
+        // Read rangefinder values
+        leftDistance = analog(analogPorts.leftRange);
+        rightDistance = analog(analogPorts.rightRange);
+
+        // Calculate error and correction
+        error = leftDistance - rightDistance;
+        correction = kp * error;
+
+        // Adjust motor speeds
+        int leftSpeed = baseSpeed - correction;
+        int rightSpeed = baseSpeed + correction;
+
+        // Move the robot forward
+        mav(wheels.frontLeft, leftSpeed);
+        mav(wheels.backLeft, leftSpeed);
+        mav(wheels.frontRight, rightSpeed);
+        mav(wheels.backRight, rightSpeed);
+
+        // Update traveled distance (assuming frontLeft motor is representative)
+        traveledDistance = get_motor_position_counter(wheels.frontLeft);
+
+        msleep(20); // Small delay for stability
+    }
+
+    // Stop the robot
+    ao();
 }
 
 /* ----- Servo Movement ------- */

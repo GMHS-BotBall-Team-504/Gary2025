@@ -36,6 +36,17 @@ void* rotateThread(void* arg) {
     return NULL;
 }
 
+void* centerDriveThread(void* arg) {
+    int* params = (int*) arg; // Cast the argument to an int array
+    int targetDistance = params[0]; // Extract the target distance
+    int baseSpeed = params[1];       // Extract the base speed
+    int kp = params[2];              // Extract the kp value
+    printf("Starting center drive: targetDistance=%d, baseSpeed=%d, kp=%d\n", targetDistance, baseSpeed, kp);
+    centerDrive(targetDistance, baseSpeed, kp); // Call the centerDrive function
+    printf("Center drive complete.\n");
+    return NULL;
+}
+
 void* runServoThreadsWrapper(void* arg) {
     ServoThreadArgs* args = (ServoThreadArgs*) arg;
     runServoThreads(args->params, args->count);

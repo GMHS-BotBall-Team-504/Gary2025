@@ -1,55 +1,36 @@
 #include "../include/library.h"
 #include <math.h>
 
-/// @brief Translates the robot in any direction; 360 degrees; Cannot rotate
-/// @param distance Target cm traveled
-/// @param radians Angle in radians to turn
-/// @param speed Speed in cm/s
-void angleDrive(int distance, int degrees, int speed) {
-    // Converting degrees into radians
-    float radians = degrees * M_PI / 180;
-
-    int topRight = sin(radians - M_PI/4) * speed;
-    int topLeft = sin(radians + M_PI/4) * speed;
-
-    move_relative_position(wheels.frontLeft, topLeft, distance);
-    move_relative_position(wheels.backLeft, topRight, distance);
-    move_relative_position(wheels.frontRight, topRight, distance);
-    move_relative_position(wheels.backRight, topLeft, distance);
-
-    for (int i = 0; i < 4; i++) {
-        block_motor_done(i);
-    }
-    msleep(10);
-    return;
-}
-
-void rotationalDrive(int distance, int directionsRadians, int turningRadians, int rotationalSpeed, int translationalSpeed) {
-
-}
-
 
 int main() {
 
-    startUp();
-    msleep(2500);
-    enable_servo(servos.claw);
-    set_servo_position(servos.claw, clawPos.open);
-    msleep(500);
-    disable_servo(servos.claw);
+    /* ---------- Pre-Run Tasks ---------- */
+    startUp(); 
+
+    /* ---------- Box Alignment ---------- */
     backwardDrive(1500, 1500);
     forwardDrive(77, 1500);
+
+    /* ---------- Box Exit ---------- */
     rightDrive(3650, 1500);
-    rotate(2190, 1500);
-    enable_servo(servos.claw);
-    set_servo_position(servos.claw, clawPos.open);
-    msleep(500);
-    disable_servo(servos.claw);
-    msleep(50);
+
+    { // Open the claw and rotate to face the poms
+        int motorParams[] = {2190, 1500};
+        ServoThreadArgs servoArgs = {
+            (ServoParams[]) {
+                {servos.claw, clawPos.open, 2}
+            }, 1
+        };
+
+        // Execute threads
+        executeMovementandServoThreads(rotateThread, motorParams, &servoArgs);
+    }
+
+    /* ---------- Floor the Claw ---------- */
     runServoThreads((ServoParams[]) {
         {servos.elbow, elbowPos.ground, 2},
         {servos.wrist, wristPos.ground, 2}
-    }, 2);
+    }, 2); // Set up so the robot doesn't break itself when it moves the servos
     
     {
         int motorParams[] = {1270, 1500};
@@ -64,14 +45,15 @@ int main() {
         // Execute threads
         executeMovementandServoThreads(backwardDriveThread, motorParams, &servoArgs);
     }
-    /* ------------ START POM SET 1 ------------------ */
+
+    /* ---------- START POM SET 1 ---------- */
     
-    forwardDrive(2770, 1500);
+    centerDrive(2800, 1500, 0.2);
     rotate(200, 1500);
     closeClaw(0);
     msleep(300);
 
-    {
+    { // Turn to face the first box
         int motorParams[] = {580, 1500};
         ServoThreadArgs servoArgs = {
             (ServoParams[]) {
@@ -81,7 +63,7 @@ int main() {
         };
 
         // Execute threads
-        executeMovementandServoThreads(rotateThread ,motorParams, &servoArgs);
+        executeMovementandServoThreads(rotateThread, motorParams, &servoArgs);
     }
 
     forwardDrive(950, 1500);
