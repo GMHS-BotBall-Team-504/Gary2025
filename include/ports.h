@@ -20,7 +20,7 @@ typedef struct {
 // Structure for analog ports (range)
 typedef struct {
     int underLight;
-    int leftRange;
+    int leftRange; // 2400 max, 900 blank
     int rightRange;
 } AnalogPorts;
 
