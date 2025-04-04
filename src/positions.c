@@ -13,7 +13,7 @@ elbowPositions elbowPos = {
     .parallelToShoulder = 1400,
     .perpendicularToShoulder = 400,
     .ground = 1452,
-    .PVC = 968
+    .PVC = 900
 };
 
 wristPositions wristPos = {
@@ -27,6 +27,6 @@ wristPositions wristPos = {
 
 clawPositions clawPos = {
     .open = 100,
-    .closedPoms = 1350,
+    .closedPoms = 1500,
     .closedPotato = 1200
 };

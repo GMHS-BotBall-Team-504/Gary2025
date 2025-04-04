@@ -4,18 +4,39 @@
 
 int main() {
 
+    /*
+    startUp();
+
+    {
+        int motorParams[] = {1570, 1500};
+        ServoThreadArgs ll = {
+            (ServoParams[]) {
+                {servos.claw, clawPos.open, 1},
+                {servos.elbow, elbowPos.starting, 1},
+                {servos.shoulder, shoulderPos.ground, 1},
+            }, 3
+        };
+
+        executeMovementandServoThreads(forwardDriveThread, motorParams, &ll);
+    };
+
+        return 0;
+
+    */
+
     /* ---------- Pre-Run Tasks ---------- */
-    startUp(); 
+    startUp();
+
 
     /* ---------- Box Alignment ---------- */
-    backwardDrive(1500, 1500);
-    forwardDrive(77, 1500);
+    backwardDrive(1300, 1500);
+    forwardDrive(350, 1500);
 
     /* ---------- Box Exit ---------- */
     rightDrive(3650, 1500);
 
     { // Open the claw and rotate to face the poms
-        int motorParams[] = {2190, 1500};
+        int motorParams[] = {1570, 1500};
         ServoThreadArgs servoArgs = {
             (ServoParams[]) {
                 {servos.claw, clawPos.open, 2}
@@ -25,20 +46,29 @@ int main() {
         // Execute threads
         executeMovementandServoThreads(rotateThread, motorParams, &servoArgs);
     }
-
+    mav(wheels.frontLeft, 200);
+    mav(wheels.backLeft, 200);
+    mav(wheels.frontRight, -200);
+    mav(wheels.backRight, -200);
+    while (analog(5) < 1500) {
+        msleep(10);
+    }
+    ao();
+    rotate(220, 1500);
+    backwardDrive(300, 1500);
     /* ---------- Floor the Claw ---------- */
     runServoThreads((ServoParams[]) {
         {servos.elbow, elbowPos.ground, 2},
         {servos.wrist, wristPos.ground, 2}
     }, 2); // Set up so the robot doesn't break itself when it moves the servos
     
-    {
+    { // Floor the overall extension while also backing up to position the poms
         int motorParams[] = {1270, 1500};
         ServoThreadArgs servoArgs = {
             (ServoParams[]) {
                 {servos.shoulder, shoulderPos.ground, 2},
                 {servos.elbow, elbowPos.ground, 2},
-            {servos.wrist, wristPos.ground, 2}
+                {servos.wrist, wristPos.ground, 2}
             }, 3
         };
 
@@ -48,48 +78,58 @@ int main() {
 
     /* ---------- START POM SET 1 ---------- */
     
-    centerDrive(2800, 1500, 0.2);
+    // Collect the poms
+    centerDrive(3150, 1500, 0.48);
     rotate(200, 1500);
     closeClaw(0);
-    msleep(300);
+    msleep(100);
+    forwardDrive(400, 1500);
 
     { // Turn to face the first box
-        int motorParams[] = {580, 1500};
+        int motorParams[] = {600, 1200};
         ServoThreadArgs servoArgs = {
             (ServoParams[]) {
-                {servos.elbow, elbowPos.PVC, 5},
-                {servos.wrist, wristPos.PVC, 5}
+                {servos.elbow, elbowPos.PVC, 2},
+                {servos.wrist, wristPos.PVC, 2}
             }, 2
         };
 
         // Execute threads
         executeMovementandServoThreads(rotateThread, motorParams, &servoArgs);
     }
-
     forwardDrive(950, 1500);
-    msleep(1200);
-    enable_servo(servos.claw);
-    set_servo_position(servos.claw, clawPos.open);
-    msleep(500);
-    disable_servo(servos.claw);
+    rightDrive(-20, -1500);
+    msleep(200);
+    openClaw();
     msleep(50);
     disable_servos();
 
-    /* ------------- END POM SET 1 ---------------- */
+    /* ------------- Set up POM SET 2 ---------------- */
 
-    return 0;
+    backwardDrive(1600, 1500);
+    rotate(-870, -1500);
+    {
+     // Turn to face the first box
+     int motorParams[] = {-300, -1500};
+     ServoThreadArgs servoArgs = {
+         (ServoParams[]) {
+            {servos.shoulder, shoulderPos.ground, 2},
+            {servos.elbow, elbowPos.ground, 2},
+            {servos.wrist, wristPos.ground, 2}
+         }, 3
+     };
 
-    startUp();
-    backwardDrive(1500, 1500);
+     // Execute threads
+     executeMovementandServoThreads(rightDriveThread, motorParams, &servoArgs);
+    }
+    rightDrive(-300, -1500);
+    forwardDrive(500, 1500);
+    
     return 0;
-    openClaw();
-    runServoThreads((ServoParams[]) {
-        {servos.shoulder, shoulderPos.PVC, 2},
-        {servos.elbow, elbowPos.PVC, 2},
-        {servos.wrist, wristPos.PVC, 2}
-    }, 3);
 
     /* ------------------------ START POM SET 2 ------------------------ */
+    
+    angleDrive(-200, 0, 1500);
     forwardDrive(450, 1500);
     
     runServoThreads((ServoParams[]) {

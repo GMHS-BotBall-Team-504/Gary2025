@@ -47,6 +47,16 @@ void* centerDriveThread(void* arg) {
     return NULL;
 }
 
+void* rightDriveThread(void*arg) {
+    int* params = (int*) arg; // Cast the argument to an int array
+    int units = params[0];   // Extract the units
+    int speed = params[1];   // Extract the speed
+    printf("Starting right drive: units=%d, speed=%d\n", units, speed);
+    rightDrive(units, speed); // Call the backwardDrive function
+    printf("Right drive complete.\n");
+    return NULL;
+}
+
 void* runServoThreadsWrapper(void* arg) {
     ServoThreadArgs* args = (ServoThreadArgs*) arg;
     runServoThreads(args->params, args->count);

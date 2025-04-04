@@ -44,14 +44,21 @@ void rightDrive(int units, int speed) {
     ao();
 }
 
-/// @brief Translates the robot in any direction; 360 degrees; Cannot rotate
-/// @param distance Target cm traveled
-/// @param radians Angle in radians to turn
-/// @param speed Speed in cm/s
+/*! \brief Translates the robot in any direction;
+ *         360 degrees;
+ *         Cannot rotate
+ *
+ *  blah blah blah
+ * 
+ * @param distance Target cm traveled
+ * @param radians Angle in radians to turn
+ * @param speed Speed in cm/s
+ */
 void angleDrive(int distance, int degrees, int speed) {
     // Converting degrees into radians
     float radians = degrees * M_PI / 180;
 
+    // Calculate motor speeds based on direction
     int topRight = sin(radians - M_PI/4) * speed;
     int topLeft = sin(radians + M_PI/4) * speed;
 
