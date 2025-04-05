@@ -23,7 +23,7 @@ This project is designed for **BotBall**, a robotics competition, leveraging the
 
 
 ## 📚 Dependencies
- - ``` sshpass``` : Sends files over much easier and quickly
+ - ```sshpass``` : Sends files over much easier and quickly
  - Docker: Used for cross-compilation.
  - CMake: Build system generator.
  - Ninja: Build system.
