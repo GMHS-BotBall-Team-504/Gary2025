@@ -30,7 +30,7 @@ This project is designed for **BotBall**, a robotics competition, leveraging the
 
 ## 🛠️ How to Build
 1. Install the above dependencies. 
-2. Make sure the ``` scripts``` folder is in the root directory of your project.  
+2. Make sure the ```scripts``` folder is in the root directory of your project.  
 3. Run the following script to build the project:
    ```sh
    ./scripts/compile.sh
