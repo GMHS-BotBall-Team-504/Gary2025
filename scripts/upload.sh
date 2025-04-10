@@ -1,1 +1,0 @@
-sshpass -p "botball" scp ../output/botball_user_program kipr@10.0.0.250:/home/kipr/
