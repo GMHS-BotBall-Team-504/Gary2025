@@ -1,7 +1,6 @@
 #include "../include/library.h"
 #include <math.h>
 
-
 int main() {
 
     /*

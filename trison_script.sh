@@ -6,7 +6,7 @@ sudo docker run -it --rm --volume ./develop:/home/kipr:rw sillyfreak/wombat-cros
 echo docker
 cd develop/
 # This is the check for either 10.0.0.250 or 192.168.125.1 or 192.168.124.1
-sshpass -p "botball" scp botball_user_program kipr@192.168.125.1:/home/kipr/
+sshpass -p "botball" scp botball_user_program kipr@192.168.137.78:/home/kipr/
 echo sent
 sudo cp botball_user_program ../execution
 echo copied

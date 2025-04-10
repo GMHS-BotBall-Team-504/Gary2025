@@ -22,6 +22,8 @@ typedef struct {
     int underLight;
     int leftRange; // 2400 max, 900 blank
     int rightRange;
+    int frontLight;
+    int startLight;
 } AnalogPorts;
 
 // Structure for digital ports (0, 1)
