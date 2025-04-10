@@ -2,6 +2,7 @@
 # This script compiles the botball user program and uploads it to the botball robot.
 
 # Copy files to build directories
+cd ..
 echo Copying files to build directories
 sudo cp -r include/ /out/build/
 sudo cp -r src/ out/build/
@@ -18,5 +19,5 @@ sudo cp botball_user_program ../bin
 echo copied
 echo Removing build artifacts
 rm -r *
-cd ..
+cd ../../scripts
 echo "Script completed successfully!"
