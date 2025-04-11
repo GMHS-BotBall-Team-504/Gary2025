@@ -32,6 +32,7 @@ void* rotateThread(void* arg) {
     int speed = params[1];    // Extract the speed
     printf("Starting rotation: degrees=%d, speed=%d\n", degrees, speed);
     rotate(degrees, speed); // Call the rotate function
+    rotateStop(speed);
     printf("Rotation complete.\n");
     return NULL;
 }

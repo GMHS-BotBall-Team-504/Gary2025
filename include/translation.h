@@ -10,6 +10,7 @@ void rotationalDrive(int distance, int directionsRadians, int turningRadians, in
 void rotate(int degrees, int speed);
 void stop(int motorSpeed);
 void backStop(int motorSpeed);
+void rotateStop(int motorSpeed);
 void centerDrive(int targetDistance, int baseSpeed, int kp);
 
 /* ----- Servo Movement ------- */

@@ -28,8 +28,7 @@ int main() {
 
     { // Open the claw and rotate to face the poms
         int motorParams[] = {1820, 1500};
-        ServoThreadArgs servoArgs = {
-            (ServoParams[]) {
+        ServoThreadArgs servoArgs = {            (ServoParams[]) {
                 {servos.claw, clawPos.open, 2}
             }, 1
         };

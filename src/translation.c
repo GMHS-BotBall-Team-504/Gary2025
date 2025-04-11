@@ -108,6 +108,15 @@ void backStop(int motorSpeed) {
     ao();
 }
 
+void rotateStop(int motorSpeed) {
+    mav(wheels.backLeft, motorSpeed);
+    mav(wheels.frontLeft, motorSpeed);
+    mav(wheels.backRight, (-1) * motorSpeed);
+    mav(wheels.frontRight, (-1) * motorSpeed);
+    msleep(30);
+    ao();
+}
+
 void centerDrive(int targetDistance, int baseSpeed, int kp) {
     int leftDistance, rightDistance, error, correction;
     int traveledDistance = 0;

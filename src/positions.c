@@ -28,7 +28,7 @@ wristPositions wristPos = {
     .perpedincularDownwards = 1776,
     .ground = 126,
     .PVC = 638, 
-    .strafe = 250 penis
+    .strafe = 250
 };
 
 /*  */
