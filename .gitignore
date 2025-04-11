@@ -1,10 +1,10 @@
 .vscode/
 build/
+CMakeLists.txt
+execution/
+execution/botball_user_program
 kipr/
 node_modules/
 out/
-CMakeLists.txt
-yarn.lock
-execution/
-execution/botball_user_program
 output
+yarn.lock
