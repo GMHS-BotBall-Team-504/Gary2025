@@ -8,6 +8,7 @@ typedef struct {
     int vertical;
     int ground;
     int PVC;
+    int strafe;
 } shoulderPositions;
 
 // Structure for elbow variables
@@ -17,6 +18,7 @@ typedef struct {
     int perpendicularToShoulder;
     int ground;
     int PVC;
+    int strafe;
 } elbowPositions;
 
 // Structure for wrist variables
@@ -27,6 +29,7 @@ typedef struct {
     int perpedincularDownwards;
     int ground;
     int PVC;
+    int strafe;
 } wristPositions;
 
 // Structure for claw variables

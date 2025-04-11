@@ -16,9 +16,11 @@ servoPorts servos = {
 };
 
 AnalogPorts analogPorts = {
-    .underLight = 0,
-    .leftRange = 2,
-    .rightRange = 3
+    .underLight = 2,
+    .leftRange = 0,
+    .rightRange = 1,
+    .frontLight = 3,
+    .startLight = 4
 };
 
 DigitalPorts digitalPorts = {

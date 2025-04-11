@@ -32,7 +32,29 @@ void* rotateThread(void* arg) {
     int speed = params[1];    // Extract the speed
     printf("Starting rotation: degrees=%d, speed=%d\n", degrees, speed);
     rotate(degrees, speed); // Call the rotate function
+    rotateStop(speed);
     printf("Rotation complete.\n");
+    return NULL;
+}
+
+void* centerDriveThread(void* arg) {
+    int* params = (int*) arg; // Cast the argument to an int array
+    int targetDistance = params[0]; // Extract the target distance
+    int baseSpeed = params[1];       // Extract the base speed
+    int kp = params[2];              // Extract the kp value
+    printf("Starting center drive: targetDistance=%d, baseSpeed=%d, kp=%d\n", targetDistance, baseSpeed, kp);
+    centerDrive(targetDistance, baseSpeed, kp); // Call the centerDrive function
+    printf("Center drive complete.\n");
+    return NULL;
+}
+
+void* rightDriveThread(void*arg) {
+    int* params = (int*) arg; // Cast the argument to an int array
+    int units = params[0];   // Extract the units
+    int speed = params[1];   // Extract the speed
+    printf("Starting right drive: units=%d, speed=%d\n", units, speed);
+    rightDrive(units, speed); // Call the backwardDrive function
+    printf("Right drive complete.\n");
     return NULL;
 }
 

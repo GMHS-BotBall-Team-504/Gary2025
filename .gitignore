@@ -1,2 +1,10 @@
-.vscode
-out
+.vscode/
+build/
+CMakeLists.txt
+execution/
+execution/botball_user_program
+kipr/
+node_modules/
+out/
+output
+yarn.lock
