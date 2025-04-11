@@ -3,11 +3,11 @@
 .PHONY: compile
 
 compile:
-   cd scripts
-   sh compile.sh
-   cd ..
+    cd scripts
+    sh compile.sh
+    cd ..
 
 upload:
-   cd scripts
-   sh compile_and_upload.sh
-   cd ..
+    cd scripts
+    sh compile_and_upload.sh
+    cd ..
