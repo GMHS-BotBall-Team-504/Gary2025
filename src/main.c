@@ -1,41 +1,31 @@
 #include "../include/library.h"
 #include <math.h>
+// 3425 seems to be 360 degrees
 
 int main() {
-
-    /*
-    startUp();
-
-    {
-        int motorParams[] = {1570, 1500};
-        ServoThreadArgs ll = {
-            (ServoParams[]) {
-                {servos.claw, clawPos.open, 1},
-                {servos.elbow, elbowPos.starting, 1},
-                {servos.shoulder, shoulderPos.ground, 1},
-            }, 3
-        };
-
-        executeMovementandServoThreads(forwardDriveThread, motorParams, &ll);
-    };
-
-        return 0;
-
-    */
-
     /* ---------- Pre-Run Tasks ---------- */
     startUp();
-
-
+    while (analog(analogPorts.startLight) > 500) {
+        msleep(10);
+    }
+    shut_down_in(119);
     /* ---------- Box Alignment ---------- */
-    backwardDrive(1300, 1500);
+    backwardDrive(900, 1500);
     forwardDrive(350, 1500);
-
     /* ---------- Box Exit ---------- */
-    rightDrive(3650, 1500);
+
+    // STRAFE POSITION
+    runServoThreads((ServoParams[]) {
+        {servos.shoulder, shoulderPos.strafe, 2},
+        {servos.elbow, elbowPos.strafe, 2},
+        {servos.wrist, wristPos.strafe, 2}
+    }, 3);
+    
+    rightDrive(3520, 1500);
+    
 
     { // Open the claw and rotate to face the poms
-        int motorParams[] = {1570, 1500};
+        int motorParams[] = {1820, 1500};
         ServoThreadArgs servoArgs = {
             (ServoParams[]) {
                 {servos.claw, clawPos.open, 2}
@@ -45,35 +35,31 @@ int main() {
         // Execute threads
         executeMovementandServoThreads(rotateThread, motorParams, &servoArgs);
     }
-    mav(wheels.frontLeft, 200);
+    move_at_velocity(wheels.frontLeft, 200);
     mav(wheels.backLeft, 200);
     mav(wheels.frontRight, -200);
     mav(wheels.backRight, -200);
-    while (analog(5) < 1500) {
+    while (analog(analogPorts.frontLight) < 1500) {
         msleep(10);
     }
     ao();
-    rotate(220, 1500);
-    backwardDrive(300, 1500);
+    mav(wheels.frontLeft, -1000);
+    mav(wheels.backLeft, -1000);
+    mav(wheels.frontRight, -1000);
+    mav(wheels.backRight, -1000);
+    while (analog(analogPorts.underLight) > 1500) {
+        msleep(3);
+    }
+    backStop(1000);
     /* ---------- Floor the Claw ---------- */
     runServoThreads((ServoParams[]) {
         {servos.elbow, elbowPos.ground, 2},
-        {servos.wrist, wristPos.ground, 2}
-    }, 2); // Set up so the robot doesn't break itself when it moves the servos
+        {servos.wrist, wristPos.ground, 2},
+        {servos.shoulder, shoulderPos.ground, 2}
+    }, 3); // Set up so the robot doesn't break itself when it moves the servos
+    msleep(500);
     
-    { // Floor the overall extension while also backing up to position the poms
-        int motorParams[] = {1270, 1500};
-        ServoThreadArgs servoArgs = {
-            (ServoParams[]) {
-                {servos.shoulder, shoulderPos.ground, 2},
-                {servos.elbow, elbowPos.ground, 2},
-                {servos.wrist, wristPos.ground, 2}
-            }, 3
-        };
-
-        // Execute threads
-        executeMovementandServoThreads(backwardDriveThread, motorParams, &servoArgs);
-    }
+    return 0;
 
     /* ---------- START POM SET 1 ---------- */
     

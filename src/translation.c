@@ -31,7 +31,7 @@ void backwardDrive(int units, int speed) {
     move_relative_position(wheels.backRight, -1 * constant * speed, -1 * constant * units);
     block_motor_done(0);
     msleep(10);
-    stop(speed);
+    backStop(speed);
 }
 
 void rightDrive(int units, int speed) {
@@ -95,6 +95,14 @@ void rotate(int degrees, int speed) {
 void stop(int motorSpeed) {
     for (int i = 0; i < 4; i++) {
         mav(i, (-1) * motorSpeed);
+    }
+    msleep(30);
+    ao();
+}
+
+void backStop(int motorSpeed) {
+    for (int i = 0; i < 4; i++) {
+        mav(i, motorSpeed);
     }
     msleep(30);
     ao();
@@ -215,12 +223,10 @@ void startUp() {
     }
     verticalArm();
     runServoThreads((ServoParams[]) {
-        {servos.shoulder, shoulderPos.starting, 30},
-        {servos.elbow, elbowPos.starting, 30},
-        {servos.wrist, wristPos.starting, 30}
+        {servos.shoulder, shoulderPos.starting, 10},
+        {servos.elbow, elbowPos.starting, 10},
+        {servos.wrist, wristPos.starting, 10}
     }, 3);
-
-    // wait_for_light(analogPorts.underLight);
-    // shut_down_in(119);
+    msleep(2000);
     return;
 }
