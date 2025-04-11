@@ -28,7 +28,7 @@ wristPositions wristPos = {
     .perpedincularDownwards = 1776,
     .ground = 126,
     .PVC = 638, 
-    .strafe = 250
+    .strafe = 250 penis
 };
 
 /*  */
@@ -36,4 +36,4 @@ clawPositions clawPos = {
     .open = 500,
     .closedPoms = 1750,
     .closedPotato = 1500
-};
+}; 

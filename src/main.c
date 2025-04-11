@@ -1,5 +1,7 @@
 #include "../include/library.h"
 #include <math.h>
+#define TAPE_THRESHOLD 1500
+#define DEGREES_TO_TICKS 3425 / 360
 // 3425 seems to be 360 degrees
 
 int main() {
@@ -39,7 +41,7 @@ int main() {
     mav(wheels.backLeft, 200);
     mav(wheels.frontRight, -200);
     mav(wheels.backRight, -200);
-    while (analog(analogPorts.frontLight) < 1500) {
+    while (analog(analogPorts.frontLight) < TAPE_THRESHOLD) {
         msleep(10);
     }
     ao();
@@ -47,7 +49,7 @@ int main() {
     mav(wheels.backLeft, -1000);
     mav(wheels.frontRight, -1000);
     mav(wheels.backRight, -1000);
-    while (analog(analogPorts.underLight) > 1500) {
+    while (analog(analogPorts.underLight) < TAPE_THRESHOLD) {
         msleep(3);
     }
     backStop(1000);
@@ -57,15 +59,13 @@ int main() {
         {servos.wrist, wristPos.ground, 2},
         {servos.shoulder, shoulderPos.ground, 2}
     }, 3); // Set up so the robot doesn't break itself when it moves the servos
-    msleep(500);
     
-    return 0;
 
     /* ---------- START POM SET 1 ---------- */
     
     // Collect the poms
-    centerDrive(3150, 1500, 0.48);
-    rotate(200, 1500);
+    forwardDrive(3150, 1500);
+    rotate(-200, -1500);
     closeClaw(0);
     msleep(100);
     forwardDrive(400, 1500);
