@@ -1,23 +1,27 @@
 #!/bin/bash
-# This script compiles the botball user program and uploads it to the botball robot.
 
-# Copy files to build directories
+# Move up one directory
 cd ..
-echo Copying files to build directories
-sudo cp -r include/ /out/build/
+
+# Remove previous build directory if it exists
+sudo rm -rf out/build
+
+# Create build directory with proper permissions
+sudo mkdir -p out/build
+sudo chmod 777 out/build
+
+# Fix path syntax and use proper cp commands for copying the necessary directories
+sudo cp -r include/ out/build/
 sudo cp -r src/ out/build/
 
-# Compile the botball user program
-echo Compiling botball_user_program
-sudo docker run -it --rm --volume ./out/build:/home/kipr:rw sillyfreak/wombat-cross aarch64-linux-gnu-gcc -g -Wall src/*.c -lkipr -lm -o botball_user_program -lz -lpthread
-echo Compiled botball_user_program
-cd out/build
+# Set permissions for the copied files and directories
+sudo chmod -R 777 out/build/
 
-# Copy and remove build artifacts
-echo Copying botball_user_program to the bin directory
-sudo cp botball_user_program ../bin
-echo copied
-echo Removing build artifacts
-rm -r *
-cd ../../scripts
-echo "Script completed successfully!"
+# Run Docker with explicit user permissions (ensure user matches current user)
+sudo docker run -it --rm --user $(id -u):$(id -g) \
+    --volume "$(pwd)/out/build:/home/kipr:rw" \
+    sillyfreak/wombat-cross aarch64-linux-gnu-gcc -g -Wall -pthread \
+    src/main.c src/ports.c src/positions.c src/servos.c src/tasks.c src/threads.c src/translation.c -lkipr -lm -o botball_user_program
+
+# Return to the original scripts directory
+cd scripts
