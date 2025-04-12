@@ -1,19 +1,20 @@
 #include "../include/library.h"
 #include <math.h>
 #define TAPE_THRESHOLD 1500
-#define DEGREES_TO_TICKS 3425 / 360
+#define DEGREES_TO_TICKS 9.013888889
 // 3425 seems to be 360 degrees
 
 int main() {
+
     /* ---------- Pre-Run Tasks ---------- */
     startUp();
-    while (analog(analogPorts.startLight) > 500) {
+    while (analog(analogPorts.startLight) > 1200) {
         msleep(10);
     }
     shut_down_in(119);
     /* ---------- Box Alignment ---------- */
     backwardDrive(900, 1500);
-    forwardDrive(350, 1500);
+    forwardDrive(150, 1500);
     /* ---------- Box Exit ---------- */
 
     // STRAFE POSITION
@@ -44,13 +45,16 @@ int main() {
         msleep(10);
     }
     ao();
+    rotate((int)(DEGREES_TO_TICKS*(-6)), -1500);
     mav(wheels.frontLeft, -1000);
     mav(wheels.backLeft, -1000);
     mav(wheels.frontRight, -1000);
     mav(wheels.backRight, -1000);
     while (analog(analogPorts.underLight) < TAPE_THRESHOLD) {
-        msleep(3);
+        msleep(5);
     }
+    printf("detected\n");
+    msleep(140);
     backStop(1000);
     /* ---------- Floor the Claw ---------- */
     runServoThreads((ServoParams[]) {
@@ -59,18 +63,24 @@ int main() {
         {servos.shoulder, shoulderPos.ground, 2}
     }, 3); // Set up so the robot doesn't break itself when it moves the servos
     
-
+    msleep(400);
     /* ---------- START POM SET 1 ---------- */
     
     // Collect the poms
-    forwardDrive(3150, 1500);
-    rotate(-200, -1500);
+    forwardDrive(2300, 1500);
+    forwardDrive(250, 1000);
+    rotate(-200, -1000);
+    runServoThreads((ServoParams[]) {
+        {servos.elbow, 2000, 2},
+        {servos.wrist, wristPos.ground, 2},
+        {servos.shoulder, shoulderPos.ground, 2}
+    }, 3); // Set up so the robot doesn't break itself when it moves the servos
     closeClaw(0);
     msleep(100);
-    forwardDrive(400, 1500);
+    backwardDrive(200, 1500);
 
     { // Turn to face the first box
-        int motorParams[] = {600, 1200};
+        int motorParams[] = {-589, -1500};
         ServoThreadArgs servoArgs = {
             (ServoParams[]) {
                 {servos.elbow, elbowPos.PVC, 2},
@@ -81,17 +91,81 @@ int main() {
         // Execute threads
         executeMovementandServoThreads(rotateThread, motorParams, &servoArgs);
     }
-    forwardDrive(950, 1500);
-    rightDrive(-20, -1500);
-    msleep(200);
+    forwardDrive(400, 1500);
+    msleep(100);
     openClaw();
     msleep(50);
-    disable_servos();
 
+    { // Open the claw and rotate to face the poms
+        int motorParams[] = {400, 1500};
+        ServoThreadArgs servoArgs = {(ServoParams[]) {
+                {servos.shoulder, shoulderPos.strafe, 2},
+                {servos.elbow, 400, 2},
+                {servos.wrist, wristPos.strafe, 2}
+            }, 3
+        };
+
+        // Execute threads
+        executeMovementandServoThreads(backwardDriveThread, motorParams, &servoArgs);
+    }
     /* ------------- Set up POM SET 2 ---------------- */
 
-    backwardDrive(1600, 1500);
-    rotate(-870, -1500);
+    { // Open the claw and rotate to face the poms
+        int motorParams[] = {DEGREES_TO_TICKS*40, 1500};
+        ServoThreadArgs servoArgs = {(ServoParams[]) {
+                {servos.shoulder, shoulderPos.strafe, 2},
+                {servos.elbow, elbowPos.strafe, 2},
+                {servos.wrist, wristPos.strafe, 2}
+            }, 3
+        };
+
+        // Execute threads
+        executeMovementandServoThreads(rotateThread, motorParams, &servoArgs);
+    }
+    move_at_velocity(wheels.frontLeft, 200);
+    mav(wheels.backLeft, 200);
+    mav(wheels.frontRight, -200);
+    mav(wheels.backRight, -200);
+    while (analog(analogPorts.frontLight) < TAPE_THRESHOLD) {
+        msleep(10);
+    }
+    ao();
+    leftDrive(800, 1500);
+    rotate(DEGREES_TO_TICKS*20, 1500);
+    leftDrive(830, 1500);
+    forwardDrive(550, 1500);
+    rotate(DEGREES_TO_TICKS*(4), -1500);
+    runServoThreads((ServoParams[]) {
+        {servos.shoulder, shoulderPos.ground, 2},
+        {servos.elbow, elbowPos.ground, 2},
+        {servos.wrist, wristPos.ground, 2}
+    }, 3);
+    rotate(DEGREES_TO_TICKS*(4), 1500);
+    rotate(DEGREES_TO_TICKS*(-5), -1500);
+    rightDrive(900, 1500);
+    forwardDrive(300, 1500);
+    rotate(DEGREES_TO_TICKS*(-25), 1500);
+    rightDrive(900, 1500);
+    forwardDrive(300, 1500);
+    rotate(DEGREES_TO_TICKS*(-25), 1500);
+    closeClaw(0);
+    return 0;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     {
      // Turn to face the first box
      int motorParams[] = {-300, -1500};
