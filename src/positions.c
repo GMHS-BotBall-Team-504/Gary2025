@@ -5,8 +5,8 @@ shoulderPositions shoulderPos = {
     .starting = 1950,
     .parallelToGround = 600,
     .vertical = 1700,
-    .ground = 1474,
-    .PVC = 1300,
+    .ground = 1350,
+    .PVC = 1474,
     .strafe = 1900
 };
 
@@ -16,7 +16,7 @@ elbowPositions elbowPos = {
     .parallelToShoulder = 27,
     .perpendicularToShoulder = 1115,
     .ground = 2047,
-    .PVC = 160,
+    .PVC = 1340,
     .strafe = 1000
 };
 
@@ -26,7 +26,7 @@ wristPositions wristPos = {
     .parallelToArm = 664,
     .perpendicularUpwards = 0,
     .perpedincularDownwards = 1776,
-    .ground = 126,
+    .ground = 280,
     .PVC = 638, 
     .strafe = 250
 };

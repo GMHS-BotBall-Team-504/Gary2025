@@ -16,7 +16,7 @@ servoPorts servos = {
 };
 
 AnalogPorts analogPorts = {
-    .underLight = 2,
+    .underLight = 5,
     .leftRange = 0,
     .rightRange = 1,
     .frontLight = 3,

@@ -5,6 +5,7 @@
 void forwardDrive(int units, int speed);
 void backwardDrive(int units, int speed);
 void rightDrive(int units, int speed);
+void leftDrive(int units, int speed);
 void angleDrive(int distance, int degrees, int speed);
 void rotationalDrive(int distance, int directionsRadians, int turningRadians, int rotationalSpeed, int translationalSpeed);
 void rotate(int degrees, int speed);

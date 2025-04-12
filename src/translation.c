@@ -5,7 +5,7 @@
 #include <kipr/wombat.h>
 #include <pthread.h>
 #include <stdlib.h>
-#define constant 0.966
+#define constant 1
 
 /* ----- Translational Movement ----- */
 
@@ -39,6 +39,16 @@ void rightDrive(int units, int speed) {
     move_relative_position(wheels.backLeft, 1 * speed, 1 * units);
     move_relative_position(wheels.frontRight, 1 * speed, 1 * units);
     move_relative_position(wheels.backRight, -1 * speed, -1 * units);
+    block_motor_done(0);
+    msleep(10);
+    ao();
+}
+
+void leftDrive(int units, int speed) {
+    move_relative_position(wheels.frontLeft, 1 * speed, 1 * units);
+    move_relative_position(wheels.backLeft, -1 * speed, -1 * units);
+    move_relative_position(wheels.frontRight, -1 * speed, -1 * units);
+    move_relative_position(wheels.backRight, 1 * speed, 1 * units);
     block_motor_done(0);
     msleep(10);
     ao();
@@ -210,10 +220,6 @@ void verticalArm() {
         {servos.wrist, 650, 45}
     }, 3);
     disable_servo(servos.claw);
-    runServoThreads((ServoParams[]) {
-        {servos.elbow, 1600, 10}, // 
-        {servos.wrist, 710, 10}
-    }, 2);
     msleep(200);
     closeClaw(0);
     printf("moved the arm up\n");
