@@ -2,6 +2,13 @@
 #define TRANSLATION_H
 
 /* ----- Translational Movement ----- */
+
+void frisbeeDriveWithAngle(float angle, float speed, float omega, int maxSpeed);
+void angularDrive(int ticks, int degrees, int ticksPerSecond);
+void crash(int backLeft, int backRight, int frontLeft, int frontRight);
+void alignRotation(int direction, int ticksPerSecond);
+void alignBack(int ticksPerSecond);
+
 void forwardDrive(int units, int speed);
 void backwardDrive(int units, int speed);
 void rightDrive(int units, int speed);
@@ -16,6 +23,7 @@ void centerDrive(int targetDistance, int baseSpeed, int kp);
 
 /* ----- Servo Movement ------- */
 
+void strafePosition();
 void servoPosition(int port, int position, int iterations);
 void openClaw();
 void closeClaw(int position);

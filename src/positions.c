@@ -37,3 +37,9 @@ clawPositions clawPos = {
     .closedPoms = 1750,
     .closedPotato = 1500
 }; 
+
+RobotState robotState = {
+    .x = 0.0,
+    .y = 0.0,
+    .theta = 0.0
+};

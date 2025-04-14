@@ -5,9 +5,91 @@
 #include <kipr/wombat.h>
 #include <pthread.h>
 #include <stdlib.h>
+#include <math.h>
 #define constant 1
 
 /* ----- Translational Movement ----- */
+
+/*! @brief Drives the robot in a direction based on the given angle and speed
+ * @param angle Angle in degrees
+ * @param speed Translational speed
+ * @param omega Angular velocity (rotation speed)
+ * @param maxSpeed Maximum speed for the wheels
+ * @details The robot will move in the direction specified by the angle, with the given translational speed and angular velocity.
+ */
+void angularDrive(float angle, float speed, float omega, int maxSpeed) {
+    // Calculate vx and vy based on the angle and speed
+    float vx = speed * cos(angle); // X-component of velocity
+    float vy = speed * sin(angle); // Y-component of velocity
+
+    // Calculate the speeds for each wheel
+    int frontLeftSpeed = (int)(vx + vy + omega);
+    int backLeftSpeed = (int)(vx - vy + omega);
+    int frontRightSpeed = (int)(vx - vy - omega);
+    int backRightSpeed = (int)(vx + vy - omega);
+
+    // Normalize speeds to ensure they don't exceed maxSpeed
+    int maxWheelSpeed = fmax(fmax(abs(frontLeftSpeed), abs(frontRightSpeed)),
+                             fmax(abs(backLeftSpeed), abs(backRightSpeed)));
+    if (maxWheelSpeed > maxSpeed) {
+        frontLeftSpeed = frontLeftSpeed * maxSpeed / maxWheelSpeed;
+        frontRightSpeed = frontRightSpeed * maxSpeed / maxWheelSpeed;
+        backLeftSpeed = backLeftSpeed * maxSpeed / maxWheelSpeed;
+        backRightSpeed = backRightSpeed * maxSpeed / maxWheelSpeed;
+    }
+
+    // Set motor speeds
+    mav(wheels.frontLeft, frontLeftSpeed);
+    mav(wheels.frontRight, frontRightSpeed);
+    mav(wheels.backLeft, backLeftSpeed);
+    mav(wheels.backRight, backRightSpeed);
+}
+
+
+void crash(int backLeft, int backRight, int frontLeft, int frontRight) {
+    mav(wheels.backLeft, (-1) * backLeft);
+    mav(wheels.backRight, (-1) * backRight);
+    mav(wheels.frontLeft, (-1) * frontLeft);
+    mav(wheels.frontRight, (-1) * frontRight);
+    msleep(30);
+    ao();
+
+}
+
+/*! @brief Aligns the robot to the tape
+ * @param direction Direction to align (1 for left, -1 for right)
+ * @param ticksPerSecond Speed in ticksDegrees/sec
+ * @details The robot will move towards the tape until it detects it.
+ */
+void alignRotation(int direction, int ticksPerSecond) {
+    int speed = (direction == 1) ? -1 * ticksPerSecond : ticksPerSecond;
+    move_at_velocity(wheels.frontLeft, speed);
+    move_at_velocity(wheels.backLeft, speed);
+    move_at_velocity(wheels.frontRight, (-1) * speed);
+    move_at_velocity(wheels.backRight, (-1) * speed);
+    while (analog(analogPorts.frontLight) < TAPE_THRESHOLD) {
+        msleep(10);
+    }
+    crash(speed, (-1) * speed, speed, (-1) * speed);
+    printf("Hit rotational tape\n");
+}
+
+/*! @brief Aligns the robot to the tape
+ * @param ticksPerSecond Speed in ticksDegrees/sec
+ * @details The robot will move towards the tape until it detects it.
+*/
+void alignBack(int ticksPerSecond) {
+    mav(wheels.frontLeft, -ticksPerSecond);
+    mav(wheels.backLeft, -ticksPerSecond);
+    mav(wheels.frontRight, -ticksPerSecond);
+    mav(wheels.backRight, -ticksPerSecond);
+    while (analog(analogPorts.underLight) < TAPE_THRESHOLD) {
+        msleep(5);
+    }
+    crash(-ticksPerSecond, -ticksPerSecond , -ticksPerSecond, -ticksPerSecond);
+    printf("Hit back tape\n");
+    return;
+}
 
 /// @brief Moves the robot forward
 /// @param units Target ticks traveled
@@ -166,6 +248,17 @@ void centerDrive(int targetDistance, int baseSpeed, int kp) {
 }
 
 /* ----- Servo Movement ------- */
+
+void strafePosition() {
+    enable_servos();
+    runServoThreads((ServoParams[]) {
+        {servos.shoulder, shoulderPos.strafe, 2},
+        {servos.elbow, elbowPos.strafe, 2},
+        {servos.wrist, wristPos.strafe, 2}
+    }, 3);
+    msleep(200);
+    disable_servos();
+}
 
 void servoPosition(int port, int position, int iterations) {
     enable_servo(port);
