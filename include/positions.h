@@ -39,10 +39,18 @@ typedef struct {
     int closedPotato;
 } clawPositions;
 
+// All values are in ticks; backLeft corner of the robot
+typedef struct {
+    float x;
+    float y;
+    float theta
+} RobotState;
+
 // Declare the global variable for variables
 extern shoulderPositions shoulderPos;
 extern elbowPositions elbowPos;
 extern wristPositions wristPos;
 extern clawPositions clawPos;
+extern RobotState robotState;
 
 #endif // POSITIONS_H
