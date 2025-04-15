@@ -9,6 +9,7 @@ typedef struct {
     int ground;
     int PVC;
     int strafe;
+    int potato;
 } shoulderPositions;
 
 // Structure for elbow variables
@@ -19,6 +20,7 @@ typedef struct {
     int ground;
     int PVC;
     int strafe;
+    int potato;
 } elbowPositions;
 
 // Structure for wrist variables
@@ -30,6 +32,7 @@ typedef struct {
     int ground;
     int PVC;
     int strafe;
+    int potato;
 } wristPositions;
 
 // Structure for claw variables
@@ -37,13 +40,14 @@ typedef struct {
     int open;
     int closedPoms;
     int closedPotato;
+    int closedBox;
 } clawPositions;
 
 // All values are in ticks; backLeft corner of the robot
 typedef struct {
     float x;
     float y;
-    float theta
+    float theta;
 } RobotState;
 
 // Declare the global variable for variables

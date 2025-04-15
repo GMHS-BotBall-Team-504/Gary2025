@@ -46,7 +46,7 @@ void runServoThreads(ServoParams params[], int numServos) {
     pthread_barrier_init(&servoBarrier, NULL, numServos);
 
     // Create threads for each servo
-    for (int i = 0; i  3.< numServos; i++) {
+    for (int i = 0; i < numServos; i++) {
         pthread_create(&threads[i], NULL, servoThread, &params[i]);
     }
 

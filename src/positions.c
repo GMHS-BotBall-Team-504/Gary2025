@@ -7,7 +7,8 @@ shoulderPositions shoulderPos = {
     .vertical = 1700,
     .ground = 1350,
     .PVC = 1474,
-    .strafe = 1900
+    .strafe = 1900,
+    .potato = 1350
 };
 
 /* Pre-Set Positions on the Elbow Hinge*/
@@ -17,7 +18,8 @@ elbowPositions elbowPos = {
     .perpendicularToShoulder = 1115,
     .ground = 2047,
     .PVC = 1340,
-    .strafe = 1000
+    .strafe = 1000,
+    .potato = 1950
 };
 
 /*  */
@@ -26,16 +28,18 @@ wristPositions wristPos = {
     .parallelToArm = 664,
     .perpendicularUpwards = 0,
     .perpedincularDownwards = 1776,
-    .ground = 280,
+    .ground = 390,
     .PVC = 638, 
-    .strafe = 250
+    .strafe = 250,
+    .potato = 200
 };
 
 /*  */
 clawPositions clawPos = {
     .open = 500,
     .closedPoms = 1750,
-    .closedPotato = 1500
+    .closedPotato = 1650,
+    .closedBox = 944
 }; 
 
 RobotState robotState = {

@@ -4,7 +4,7 @@
 /* ----- Translational Movement ----- */
 
 void frisbeeDriveWithAngle(float angle, float speed, float omega, int maxSpeed);
-void angularDrive(int ticks, int degrees, int ticksPerSecond);
+void angularDrive(float angle, float speed, float omega, int maxSpeed);
 void crash(int backLeft, int backRight, int frontLeft, int frontRight);
 void alignRotation(int direction, int ticksPerSecond);
 void alignBack(int ticksPerSecond);
