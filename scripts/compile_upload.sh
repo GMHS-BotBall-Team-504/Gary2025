@@ -21,7 +21,7 @@ sudo chmod -R 777 out/build/
 sudo docker run -it --rm --user $(id -u):$(id -g) \
     --volume "$(pwd)/out/build:/home/kipr:rw" \
     sillyfreak/wombat-cross aarch64-linux-gnu-gcc -g -Wall -pthread \
-    src/main.c src/ports.c src/positions.c src/servos.c src/tasks.c src/threads.c src/translation.c -lkipr -lm -o botball_user_program
+    src/manual.c src/ports.c src/positions.c src/servos.c src/tasks.c src/threads.c src/translation.c -lkipr -lm -o botball_user_program
 
 # Return to the original scripts directory
 cd scripts
