@@ -357,6 +357,7 @@ void helpCommand(const char *params) {
     printf(GREEN_COLOR " - battery (b)\n" RESET_COLOR);
     printf(GREEN_COLOR " - help (h)\n" RESET_COLOR);
     printf(GREEN_COLOR " - clear (c)\n" RESET_COLOR);
+    printf(GREEN_COLOR " - driveDirection (dd) <direction> <distance> <speed>\n" RESET_COLOR);
     printf(CYAN_COLOR "Type 'exit' to quit the program.\n" RESET_COLOR);
 }
 
@@ -392,6 +393,7 @@ void displayPrompt() {
 void displaySuccess(const char *message) {
     printf(GREEN_COLOR "%s\n" RESET_COLOR, message);
 }
+
 void driveDirection(const char *params) {
     int direction, distance, speed;
     if (sscanf(params, "%d %d %d", &direction, &distance, &speed) == 3) {
@@ -409,6 +411,27 @@ void driveDirection(const char *params) {
             int rearLeftSpeed = (int)(speed * (cos_dir + sin_dir));
             int rearRightSpeed = (int)(speed * (cos_dir - sin_dir));
 
+            // Find the maximum calculated speed
+            int maxSpeed = abs(frontLeftSpeed);
+            if (frontRightSpeed > maxSpeed) { maxSpeed = abs(frontRightSpeed); }
+            if (rearLeftSpeed > maxSpeed) { maxSpeed = abs(rearLeftSpeed); }
+            if (rearRightSpeed > maxSpeed) { maxSpeed = abs(rearRightSpeed); }
+
+            // Calculate the scaling factor
+            double scaleFactor = 1.0;
+            if (maxSpeed > 1500) {
+                scaleFactor = 1500.0 / maxSpeed;
+            }
+            printf("scaleFactor: %f,\n", scaleFactor);
+            printf("maxSpeed: %d,\n", maxSpeed);
+
+            // Apply the scaling factor to all speeds
+            frontLeftSpeed = (int)(frontLeftSpeed * scaleFactor);
+            frontRightSpeed = (int)(frontRightSpeed * scaleFactor);
+            rearLeftSpeed = (int)(rearLeftSpeed * scaleFactor);
+            rearRightSpeed = (int)(rearRightSpeed * scaleFactor);
+            printf("frontLeftSpeed: %d,\nfrontRightSpeed: %d,\nrearLeftSpeed: %d,\nrearRightSpeed: %d,\n", frontLeftSpeed, frontRightSpeed, rearLeftSpeed, rearRightSpeed);
+
             // Call the appropriate drive functions
             move_relative_position(wheels.frontLeft, frontLeftSpeed);
             move_relative_position(wheels.frontRight, frontRightSpeed);
@@ -422,6 +445,7 @@ void driveDirection(const char *params) {
             msleep(30);
             all_off(); // Stop the motors
             printf("Drove in direction %d for %d units at speed %d.\n", direction, distance, speed);
+
         } else {
             printf("Invalid parameters for driveDirection. Usage: driveDirection <direction> <distance> <speed>\n");
         }
