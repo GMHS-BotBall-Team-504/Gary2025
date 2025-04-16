@@ -5,6 +5,7 @@ cd ..
 
 # Remove previous build directory if it exists
 sudo rm -rf out/build
+echo verified
 
 # Create build directory with proper permissions
 sudo mkdir -p out/build
@@ -26,4 +27,4 @@ sudo docker run -it --rm --user $(id -u):$(id -g) \
 # Return to the original scripts directory
 cd scripts
 
-sshpass -p "botball" scp /home/oreo/Desktop/Gary2025/out/build/botball_user_program kipr@192.168.125.1:/home/kipr/botball_user_program
+sshpass -p "botball" scp /home/oreo/Desktop/Gary2025/out/build/botball_user_program kipr@10.0.0.250:/home/kipr/botball_user_program
