@@ -410,9 +410,17 @@ void driveDirection(const char *params) {
             int rearRightSpeed = (int)(speed * (cos_dir - sin_dir));
 
             // Call the appropriate drive functions
-            setMotorSpeeds(frontLeftSpeed, frontRightSpeed, rearLeftSpeed, rearRightSpeed);
-            msleep(distance * 10); // Assuming 10 ms per unit distance
-            setMotorSpeeds(0, 0, 0, 0); // Stop the motors
+            move_relative_position(wheels.frontLeft, frontLeftSpeed);
+            move_relative_position(wheels.frontRight, frontRightSpeed);
+            move_relative_position(wheels.backLeft, rearLeftSpeed);
+            move_relative_position(wheels.backRight, rearRightSpeed);
+            block_motor_done(0);
+            mav(wheels.frontLeft, (-1) * frontLeftSpeed);
+            mav(wheels.frontRight, (-1) * frontRightSpeed);
+            mav(wheels.backLeft, (-1) * rearLeftSpeed);
+            mav(wheels.backRight, (-1) * rearRightSpeed);
+            msleep(30);
+            all_off(); // Stop the motors
             printf("Drove in direction %d for %d units at speed %d.\n", direction, distance, speed);
         } else {
             printf("Invalid parameters for driveDirection. Usage: driveDirection <direction> <distance> <speed>\n");
