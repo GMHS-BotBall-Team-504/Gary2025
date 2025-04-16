@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <math.h>
 
 #define TAPE_THRESHOLD 1500
@@ -10,7 +11,19 @@
 #define STRAIGHT_CM_TO_TICKS 130.0000
 #define MAX_COMMAND_LENGTH 100
 
+#define RESET_COLOR "\033[0m"
+#define GREEN_COLOR "\033[32m"
+#define RED_COLOR "\033[31m"
+#define YELLOW_COLOR "\033[33m"
+#define CYAN_COLOR "\033[36m"
+
+void displayWelcomeHeader();
+void displayPrompt();
+void displaySuccess(const char *message);
+void driveDirection(const char *params);
+
 // Function prototypes for commands
+void executeCommand(const char *command, const char *params);
 void turnRight(const char *params);
 void turnLeft(const char *params);
 void driveForward(const char *params);
@@ -19,6 +32,7 @@ void driveRight(const char *params);
 void driveLeft(const char *params);
 void lowerArm(const char *params);
 void moveArm(const char *params);
+void newServoPos(const char *params);
 void strafeArm(const char *params);
 void pvcArm(const char *params);
 void potatoArm(const char *params);
@@ -26,6 +40,9 @@ void groundArm(const char *params);
 void openPos(const char *params);
 void closePos(const char *params);
 void closeBox(const char *params);
+void helpCommand(const char *params);
+void clearCommand(const char *params);
+void batteryLevel(const char *params);
 
 // Command structure
 typedef struct {
@@ -33,37 +50,60 @@ typedef struct {
     void (*execute)(const char *params);
 } Command;
 
-// Command table
+// Command tabl
 const Command commandTable[] = {
     {"turnRight", turnRight},
+    {"tr", turnRight}, // Alias for turnRight
     {"turnLeft", turnLeft},
+    {"tl", turnLeft}, // Alias for turnLeft
     {"driveForward", driveForward},
+    {"df", driveForward}, // Alias for driveForward
     {"driveBackward", driveBackward},
+    {"db", driveBackward}, // Alias for driveBackward
     {"driveRight", driveRight},
+    {"dr", driveRight}, // Alias for driveRight
     {"driveLeft", driveLeft},
+    {"dl", driveLeft}, // Alias for driveLeft
     {"lowerArm", lowerArm},
+    {"la", lowerArm}, // Alias for lowerArm
     {"moveArm", moveArm},
+    {"ma", moveArm}, // Alias for moveArm
+    {"moveServo", newServoPos},
+    {"ms", newServoPos}, // Alias for moveServo
     {"strafePos", strafeArm},
+    {"sp", strafeArm}, // Alias for strafePos
     {"pvcPos", pvcArm},
+    {"pvc", pvcArm}, // Alias for pvcPos
     {"potatoPos", potatoArm},
+    {"pp", potatoArm}, // Alias for potatoPos
     {"groundPos", groundArm},
+    {"gp", groundArm}, // Alias for groundPos
     {"openPos", openPos},
+    {"op", openPos}, // Alias for openPos
     {"closePos", closePos},
+    {"cp", closePos}, // Alias for closePos
     {"closeBox", closeBox},
+    {"cb", closeBox}, // Alias for closeBox
+    {"battery", batteryLevel},
+    {"b", batteryLevel}, // Alias for battery
+    {"help", helpCommand},
+    {"h", helpCommand}, // Alias for help
+    {"clear", clearCommand},
+    {"c", clearCommand}, // Alias for clear
+    {"driveDirection", driveDirection},
+    {"dd", driveDirection}, // Alias for driveDirection
     {NULL, NULL}
 };
-
-void executeCommand(const char *command, const char *params);
 
 int main() {
     char input[MAX_COMMAND_LENGTH];
     char command[50];
     char params[MAX_COMMAND_LENGTH - 50];
 
-    printf("Manual control mode. Enter commands (type 'exit' to quit):\n");
+    displayWelcomeHeader();
 
     while (1) {
-        printf("> ");
+        displayPrompt();
         if (fgets(input, sizeof(input), stdin) == NULL) {
             break; // Exit on EOF or error
         }
@@ -73,8 +113,8 @@ int main() {
             continue; // Skip empty input
         }
 
-        if (strcmp(command, "exit") == 0) {
-            printf("Exiting manual control mode.\n");
+        if ((strcmp(command, "exit") == 0) || (strcmp(command, "quit") == 0)) {
+            displaySuccess("Exiting Manual Control Mode. Goodbye!");
             break;
         }
 
@@ -88,11 +128,14 @@ int main() {
 void executeCommand(const char *command, const char *params) {
     for (int i = 0; commandTable[i].name != NULL; i++) {
         if (strcmp(command, commandTable[i].name) == 0) {
+            printf(GREEN_COLOR "Executing command: %s\n" RESET_COLOR, command);
             commandTable[i].execute(params);
             return;
         }
     }
-    printf("Unknown command: %s\n", command);
+
+    // Print an error message for unknown commands
+    printf(RED_COLOR "Error: Unknown command '%s'. Please try again.\n" RESET_COLOR, command);
 }
 
 
@@ -121,42 +164,58 @@ void turnLeft(const char *params) {
 }
 
 void driveForward(const char *params) {
-    int distance = atoi(params); // Convert parameter to integer
-    if (distance > 0) {
-        forwardDrive(distance, 1500);
-        printf("Drove forward %d units.\n", distance);
+    int speed, distance;
+    if (sscanf(params, "%d %d", &speed, &distance) == 2) {
+        if (speed > 0 && distance > 0) {
+            forwardDrive(distance, speed);
+            printf("Drove forward %d units at speed %d.\n", distance, speed);
+        } else {
+            printf("Invalid parameters for drive_forward. Usage: drive_forward <speed> <distance>\n");
+        }
     } else {
-        printf("Invalid parameters for drive_forward. Usage: drive_forward <distance>\n");
+        printf("Invalid parameters for drive_forward. Usage: drive_forward <speed> <distance>\n");
     }
 }
 
 void driveBackward(const char *params) {
-    int distance = atoi(params); // Convert parameter to integer
-    if (distance > 0) {
-        backwardDrive(distance, 1500);
-        printf("Drove forward %d units.\n", distance);
+    int speed, distance;
+    if (sscanf(params, "%d %d", &speed, &distance) == 2) {
+        if (speed > 0 && distance > 0) {
+            backwardDrive(distance, speed);
+            printf("Drove backward %d units at speed %d.\n", distance, speed);
+        } else {
+            printf("Invalid parameters for drive_backward. Usage: drive_backward <speed> <distance>\n");
+        }
     } else {
-        printf("Invalid parameters for drive_forward. Usage: drive_forward <distance>\n");
+        printf("Invalid parameters for drive_backward. Usage: drive_backward <speed> <distance>\n");
     }
 }
 
 void driveRight(const char *params) {
-    int distance = atoi(params); // Convert parameter to integer
-    if (distance > 0) {
-        rightDrive(distance, 1500);
-        printf("Drove right %d units.\n", distance);
+    int speed, distance;
+    if (sscanf(params, "%d %d", &speed, &distance) == 2) {
+        if (speed > 0 && distance > 0) {
+            rightDrive(distance, speed);
+            printf("Drove right %d units at speed %d.\n", distance, speed);
+        } else {
+            printf("Invalid parameters for drive_right. Usage: drive_right <speed> <distance>\n");
+        }
     } else {
-        printf("Invalid parameters for drive_forward. Usage: drive_forward <distance>\n");
+        printf("Invalid parameters for drive_right. Usage: drive_right <speed> <distance>\n");
     }
 }
 
 void driveLeft(const char *params) {
-    int distance = atoi(params); // Convert parameter to integer
-    if (distance > 0) {
-        leftDrive(distance, 1500);
-        printf("Drove left %d units.\n", distance);
+    int speed, distance;
+    if (sscanf(params, "%d %d", &speed, &distance) == 2) {
+        if (speed > 0 && distance > 0) {
+            leftDrive(distance, speed);
+            printf("Drove left %d units at speed %d.\n", distance, speed);
+        } else {
+            printf("Invalid parameters for drive_left. Usage: drive_left <speed> <distance>\n");
+        }
     } else {
-        printf("Invalid parameters for drive_forward. Usage: drive_forward <distance>\n");
+        printf("Invalid parameters for drive_left. Usage: drive_left <speed> <distance>\n");
     }
 }
 
@@ -181,6 +240,28 @@ void moveArm(const char *params) {
         printf("Moved arm to positions - Shoulder: %d, Elbow: %d, Wrist: %d\n", shoulder, elbow, wrist);
     } else {
         printf("Invalid parameters for move_arm. Usage: move_arm <shoulder> <elbow> <wrist>\n");
+    }
+}
+
+void newServoPos(const char *params) {
+    char servoName[50];
+    int position;
+    if (sscanf(params, "%s %d", servoName, &position) == 2) {
+        if (strcmp(servoName, "shoulder") == 0) {
+            set_servo_position(servos.shoulder, position);
+        } else if (strcmp(servoName, "elbow") == 0) {
+            set_servo_position(servos.elbow, position);
+        } else if (strcmp(servoName, "wrist") == 0) {
+            set_servo_position(servos.wrist, position);
+        } else if (strcmp(servoName, "claw") == 0) {
+            set_servo_position(servos.claw, position);
+        } else {
+            printf("Invalid servo name. Usage: move_servo <servo_name> <position>\n");
+            return;
+        }
+        printf("Moved servo %s to position %d\n", servoName, position);
+    } else {
+        printf("Invalid parameters for move_servo. Usage: move_servo <servo_name> <position>\n");
     }
 }
 
@@ -254,4 +335,89 @@ void closeBox(const char *params) {
     set_servo_position(servos.claw, clawPos.closedBox);
     msleep(500);
     printf("Closed claw to Box.\n");
+}
+
+void helpCommand(const char *params) {
+    printf(CYAN_COLOR "Available Commands (with aliases):\n" RESET_COLOR);
+    printf(GREEN_COLOR " - turnRight (tr) <degrees>\n" RESET_COLOR);
+    printf(GREEN_COLOR " - turnLeft (tl) <degrees>\n" RESET_COLOR);
+    printf(GREEN_COLOR " - driveForward (df) <distance>\n" RESET_COLOR);
+    printf(GREEN_COLOR " - driveBackward (db) <distance>\n" RESET_COLOR);
+    printf(GREEN_COLOR " - driveRight (dr) <distance>\n" RESET_COLOR);
+    printf(GREEN_COLOR " - driveLeft (dl) <distance>\n" RESET_COLOR);
+    printf(GREEN_COLOR " - lowerArm (la)\n" RESET_COLOR);
+    printf(GREEN_COLOR " - moveArm (ma) <shoulder> <elbow> <wrist>\n" RESET_COLOR);
+    printf(GREEN_COLOR " - strafePos (sp)\n" RESET_COLOR);
+    printf(GREEN_COLOR " - pvcPos (pvc)\n" RESET_COLOR);
+    printf(GREEN_COLOR " - potatoPos (pp)\n" RESET_COLOR);
+    printf(GREEN_COLOR " - groundPos (gp)\n" RESET_COLOR);
+    printf(GREEN_COLOR " - openPos (op)\n" RESET_COLOR);
+    printf(GREEN_COLOR " - closePos (cp) <0|1>\n" RESET_COLOR);
+    printf(GREEN_COLOR " - closeBox (cb)\n" RESET_COLOR);
+    printf(GREEN_COLOR " - battery (b)\n" RESET_COLOR);
+    printf(GREEN_COLOR " - help (h)\n" RESET_COLOR);
+    printf(GREEN_COLOR " - clear (c)\n" RESET_COLOR);
+    printf(CYAN_COLOR "Type 'exit' to quit the program.\n" RESET_COLOR);
+}
+
+void clearCommand(const char *params) {
+    displayWelcomeHeader();
+}
+
+void batteryLevel(const char *params) {
+    float battery = power_level() * 100;
+    printf("Battery level: %.2f%%\n", battery); // Rounds to 2 decimal places
+}
+
+void displayWelcomeHeader() {
+    system("clear");
+    printf(CYAN_COLOR "==============================================================\n");
+    printf("   " GREEN_COLOR "██████╗  ██████╗ ████████╗██████╗  █████╗ ██╗     ██╗     \n");
+    printf("   ██╔══██╗██╔═══██╗╚══██╔══╝██╔══██╗██╔══██╗██║     ██║     \n");
+    printf("   ██████╔╝██║   ██║   ██║   ██████╔╝███████║██║     ██║     \n");
+    printf("   ██╔══██╗██║   ██║   ██║   ██╔══██╗██╔══██║██║     ██║     \n");
+    printf("   ██████╔╝╚██████╔╝   ██║   ██████╔╝██║  ██║███████╗███████╗\n");
+    printf("   ╚═════╝  ╚═════╝    ╚═╝   ╚═════╝ ╚═╝  ╚═╝╚══════╝╚══════╝\n" RESET_COLOR);
+    printf(CYAN_COLOR "==============================================================\n");
+    printf("   Welcome to " GREEN_COLOR "Manual Control Mode\n");
+    printf(CYAN_COLOR "   Enter commands (type 'exit' or 'quit')\n");
+    printf("==============================================================\n" RESET_COLOR);
+    printf(YELLOW_COLOR "Available Commands: Type 'help' or 'h' to see the list.\n" RESET_COLOR);
+}
+
+void displayPrompt() {
+    printf(YELLOW_COLOR "\n[COMMAND]> " RESET_COLOR);
+}
+
+void displaySuccess(const char *message) {
+    printf(GREEN_COLOR "%s\n" RESET_COLOR, message);
+}
+void driveDirection(const char *params) {
+    int direction, distance, speed;
+    if (sscanf(params, "%d %d %d", &direction, &distance, &speed) == 3) {
+        if (direction < 0) {
+            direction = (direction % 360 + 360) % 360; // Convert negative direction to positive
+        }
+        if (direction >= 0 && direction <= 360 && distance > 0 && speed > 0) {
+            // Calculate wheel speeds based on direction
+            double rad = direction * (M_PI / 180.0);
+            double cos_dir = cos(rad);
+            double sin_dir = sin(rad);
+
+            int frontLeftSpeed = (int)(speed * (cos_dir - sin_dir));
+            int frontRightSpeed = (int)(speed * (cos_dir + sin_dir));
+            int rearLeftSpeed = (int)(speed * (cos_dir + sin_dir));
+            int rearRightSpeed = (int)(speed * (cos_dir - sin_dir));
+
+            // Call the appropriate drive functions
+            setMotorSpeeds(frontLeftSpeed, frontRightSpeed, rearLeftSpeed, rearRightSpeed);
+            msleep(distance * 10); // Assuming 10 ms per unit distance
+            setMotorSpeeds(0, 0, 0, 0); // Stop the motors
+            printf("Drove in direction %d for %d units at speed %d.\n", direction, distance, speed);
+        } else {
+            printf("Invalid parameters for driveDirection. Usage: driveDirection <direction> <distance> <speed>\n");
+        }
+    } else {
+        printf("Invalid parameters for driveDirection. Usage: driveDirection <direction> <distance> <speed>\n");
+    }
 }
