@@ -17,7 +17,7 @@ elbowPositions elbowPos = {
     .parallelToShoulder = 27,
     .perpendicularToShoulder = 1115,
     .ground = 2047,
-    .PVC = 1340,
+    .PVC = 1723,
     .strafe = 1000,
     .potato = 1950
 };

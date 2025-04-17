@@ -7,7 +7,9 @@
 // 3425 seems to be 360 degrees
 
 int main() {
-
+    printf("Are you ready? Press enter to proceed. Good Luck!");
+    getchar();
+    printf("==============================================================\n");
 
     /* ##################################################################
     |  Pre - Run Tasks
@@ -17,6 +19,8 @@ int main() {
     while (analog(analogPorts.startLight) > 1200) {
         msleep(10);
     }
+    printf("Alright, I'm ready to go!\n");
+    getchar();
     shut_down_in(119);
 
 
@@ -24,9 +28,8 @@ int main() {
     |  Starting Alignment
     | ################################################################### */
 
-    backwardDrive(900, 1500);
     robotState = (RobotState) {
-        .x = 23.20 * CM_TO_TICKS,
+        .x = 23.20 * STRAIGHT_CM_TO_TICKS,
         .y = 0.00,
         .theta = 1622.50
     };
@@ -190,7 +193,7 @@ int main() {
     | ################################################################### */
 
     robotState = (RobotState) {
-        .x = 23.20 * CM_TO_TICKS,
+        .x = 23.20 * STRAIGHT_CM_TO_TICKS,
         .y = 0.00,
         .theta = 0
     };
