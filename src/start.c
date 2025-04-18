@@ -34,7 +34,6 @@ int get_choice() {
 }
 
 
-
 int main() {
     display_menu();
     int choice = get_choice();

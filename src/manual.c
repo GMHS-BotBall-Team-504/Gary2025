@@ -482,3 +482,11 @@ void driveDirection(const char *params) {
         printf("Invalid parameters for driveDirection. Usage: driveDirection <direction> <distance> <speed>\n");
     }
 }
+
+/* Here's the idea
+Get the initial params
+Get the final params
+Have the robot slowly phase from the initial to final params
+Throw in a slow rotation at the same time
+Be sure to ratio!
+*/
