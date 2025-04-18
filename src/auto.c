@@ -25,7 +25,7 @@ void driveDirection(const char *params);
 
 // Function prototypes for commands
 void executeCommand(const char *command, const char *params);
-void turnRight(const char *params);
+int turnRight(const char *params);
 void turnLeft(const char *params);
 void driveForward(const char *params);
 void driveBackward(const char *params);
@@ -151,24 +151,36 @@ void turnRight(const char *params) {
     for (int i = 0; i < 4; i++) {
         cmpc(i);
     }
-    int speed, degrees;
-    if (sscanf(params, "%d %d", &speed, &degrees) == 2) {
-        if (speed > 0 && degrees > 0) {
-            rotate(DEGREES_TO_TICKS * -degrees, -speed);
-            printf("Turned right %d degrees at speed %d.\n", degrees, speed);
-        } else {
-            printf("Invalid parameters for turn_right.\nUsage: turn_right <speed> <degrees>\n");
-        }
-    } else if (sscanf(params, "%d", &degrees) == 1) {
-        if (degrees > 0) {
-            rotate(DEGREES_TO_TICKS * -degrees, -1500);
-            printf("Turned right %d degrees at speed 1500.\n", degrees);
-        } else {
-            printf("Invalid parameters for turn_right.\nUsage: turn_right <degrees>\n");
-        }
-    } else {
-        printf("Invalid parameters for turn_right.\nUsage: turn_right <speed> <degrees>\n");
+    int speed = atoi(params);
+    if (speed < 0) {
+        printf("Invalid speed for turn_right. Speed must be positive.\n");
+        return -1;
     }
+    printf("Rotating right \@ speed %d.\n", speed);
+    else {
+        move_at_velocity(wheels.frontLeft, speed);
+        move_at_velocity(wheels.backLeft, speed);
+        move_at_velocity(wheels.frontRight, -speed);
+        move_at_velocity(wheels.backRight, -speed);
+    }
+    char input;
+    int distance;
+    while (1) {
+        if (read(STDIN_FILENO, &input, 1) == 1) {
+            if (input == 'q') {
+                printf("Stopping rotation.\n");
+                distance = get_motor_position_counter(wheels.frontLeft);
+                move_relative_position(wheels.frontLeft, (-1) * speed, (-1) * degrees);
+                move_relative_position(wheels.backLeft, (-1) * speed, (-1) * degrees);
+                move_relative_position(wheels.frontRight, speed, degrees);
+                move_relative_position(wheels.backRight, speed, degrees);
+                msleep(30);
+                ao();
+            }
+        }
+        msleep(10);
+    }
+    return distance / DEGREES_TO_TICKS;
 }
 
 void turnLeft(const char *params) {
