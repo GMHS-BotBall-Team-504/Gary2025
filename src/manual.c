@@ -52,7 +52,7 @@ typedef struct {
     void (*execute)(const char *params);
 } Command;
 
-// Command tabl
+// Command table
 const Command commandTable[] = {
     {"turnRight", turnRight},
     {"tr", turnRight}, // Alias for turnRight
