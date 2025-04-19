@@ -365,6 +365,7 @@ void closeBox(const char *params) {
 }
 
 void helpCommand(const char *params) {
+    printf("YOU'RE ON MANUAL");
     printf(CYAN_COLOR "Available Commands (with aliases):\n" RESET_COLOR);
     printf(MAGENTA_COLOR " - turnRight (tr) <speed> <degrees>\n" RESET_COLOR);
     printf(MAGENTA_COLOR " - turnLeft (tl) <speed> <degrees>\n" RESET_COLOR);
@@ -408,7 +409,7 @@ void displayWelcomeHeader() {
     printf("   ██████╔╝╚██████╔╝   ██║   ██████╔╝██║  ██║███████╗███████╗\n");
     printf("   ╚═════╝  ╚═════╝    ╚═╝   ╚═════╝ ╚═╝  ╚═╝╚══════╝╚══════╝\n" RESET_COLOR);
     printf(CYAN_COLOR "==============================================================\n");
-    printf("   Welcome to " GREEN_COLOR "Manual Control Mode\n");
+    printf("   Welcome to " GREEN_COLOR "nards Control Mode\n");
     printf(CYAN_COLOR "   Enter commands (type 'exit' or 'quit')\n");
     printf("==============================================================\n" RESET_COLOR);
     printf(YELLOW_COLOR "Available Commands: Type 'help' or 'h' to see the list.\n" RESET_COLOR);

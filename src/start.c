@@ -39,12 +39,15 @@ int main() {
     int choice = get_choice();
     switch (choice) {
         case 1:
+            printf("Running manual.c...\n");
             system("./manual");
             break;
         case 2:
+            printf("Running main.c...\n");
             system("./main");
             break;
         case 3:
+            printf("Running auto.c...\n");
             system("./auto");
             break;
         case 4:

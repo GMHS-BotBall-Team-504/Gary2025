@@ -25,7 +25,7 @@ void driveDirection(const char *params);
 
 // Function prototypes for commands
 void executeCommand(const char *command, const char *params);
-int turnRight(const char *params);
+void turnRight(const char *params);
 void turnLeft(const char *params);
 void driveForward(const char *params);
 void driveBackward(const char *params);
@@ -152,11 +152,50 @@ void turnRight(const char *params) {
         cmpc(i);
     }
     int speed = atoi(params);
+    printf("Input Speed: %d.\n", speed);
     if (speed < 0) {
-        printf("Invalid speed for turn_right. Speed must be positive.\n");
-        return -1;
+        printf("Invalid speed for turnRight. Speed must be positive.\n");
+        return;
     }
-    printf("Rotating right \@ speed %d.\n", speed);
+    else {
+        move_at_velocity(wheels.frontLeft, -speed);
+        move_at_velocity(wheels.backLeft, -speed);
+        move_at_velocity(wheels.frontRight, speed);
+        move_at_velocity(wheels.backRight, speed);
+    }
+    char input;
+    int distance;
+    while (1) {
+        if (read(STDIN_FILENO, &input, 1) == 1) {
+            if (input == '\n') {
+                break; // Exit the loop on Enter key
+            }
+        }
+        msleep(10);
+    }
+    printf("Stopping rotation.\n");
+    distance = (int)(get_motor_position_counter(wheels.frontLeft) / DEGREES_TO_TICKS);
+    move_at_velocity(wheels.frontLeft, speed);
+    move_at_velocity(wheels.backLeft, speed);
+    move_at_velocity(wheels.frontRight, -speed);
+    move_at_velocity(wheels.backRight, -speed);
+    msleep(30);
+    ao();
+    printf("Turned %d degrees at speed %d.\n", abs(distance), speed);
+    printf("-------------------------------\n");
+    return;
+}
+
+void turnLeft(const char *params) {
+    for (int i = 0; i < 4; i++) {
+        cmpc(i);
+    }
+    int speed = atoi(params);
+    printf("Input Speed: %d.\n", speed);
+    if (speed < 0) {
+        printf("Invalid speed for turnLeft. Speed must be positive.\n");
+        return;
+    }
     else {
         move_at_velocity(wheels.frontLeft, speed);
         move_at_velocity(wheels.backLeft, speed);
@@ -167,83 +206,107 @@ void turnRight(const char *params) {
     int distance;
     while (1) {
         if (read(STDIN_FILENO, &input, 1) == 1) {
-            if (input == 'q') {
-                printf("Stopping rotation.\n");
-                distance = get_motor_position_counter(wheels.frontLeft);
-                move_relative_position(wheels.frontLeft, (-1) * speed, (-1) * degrees);
-                move_relative_position(wheels.backLeft, (-1) * speed, (-1) * degrees);
-                move_relative_position(wheels.frontRight, speed, degrees);
-                move_relative_position(wheels.backRight, speed, degrees);
-                msleep(30);
-                ao();
+            if (input == '\n') {
+                break; // Exit the loop on Enter key
             }
         }
         msleep(10);
     }
-    return distance / DEGREES_TO_TICKS;
-}
-
-void turnLeft(const char *params) {
-    int speed, degrees;
-    if (sscanf(params, "%d %d", &speed, &degrees) == 2) {
-        if (speed > 0 && degrees > 0) {
-            rotate(DEGREES_TO_TICKS * degrees, speed);
-            printf("Turned left %d degrees at speed %d.\n", degrees, speed);
-        } else {
-            printf("Invalid parameters for turn_left. Usage: turn_left <speed> <degrees>\n");
-        }
-    } else if (sscanf(params, "%d", &degrees) == 1) {
-        if (degrees > 0) {
-            rotate(DEGREES_TO_TICKS * degrees, 1500);
-            printf("Turned left %d degrees at speed 1500.\n", degrees);
-        } else {
-            printf("Invalid parameters for turn_left. Usage: turn_left <degrees>\n");
-        }
-    } else {
-        printf("Invalid parameters for turn_left. Usage: turn_left <speed> <degrees>\n");
-    }
+    printf("Stopping rotation.\n");
+    distance = (int)(get_motor_position_counter(wheels.frontLeft) / DEGREES_TO_TICKS);
+    move_at_velocity(wheels.frontLeft, -speed);
+    move_at_velocity(wheels.backLeft, -speed);
+    move_at_velocity(wheels.frontRight, speed);
+    move_at_velocity(wheels.backRight, speed);
+    msleep(30);
+    ao();
+    printf("Turned %d degrees at speed %d.\n", abs(distance), speed);
+    printf("-------------------------------\n");
+    return;
 }
 
 void driveForward(const char *params) {
-    int speed, distance;
-    if (sscanf(params, "%d %d", &speed, &distance) == 2) {
-        if (speed > 0 && distance > 0) {
-            forwardDrive(distance, speed);
-            printf("Drove forward %d units at speed %d.\n", distance, speed);
-        } else {
-            printf("Invalid parameters for drive_forward.\nUsage: drive_forward <speed> <distance>\n");
-        }
-    } else {
-        printf("Invalid parameters for drive_forward.\nUsage: drive_forward <speed> <distance>\n");
+    for (int i = 0; i < 4; i++) {
+        cmpc(i);
     }
+    int speed = atoi(params);
+    mav(wheels.frontLeft, speed);
+    mav(wheels.backLeft, speed);
+    mav(wheels.frontRight, speed);
+    mav(wheels.backRight, speed);
+    char input;
+    int distance;
+    while (1) {
+        if (read(STDIN_FILENO, &input, 1) == 1) {
+            if (input == '\n') {
+                break; // Exit the loop on Enter key
+            }
+        }
+        msleep(10);
+    }
+    printf("Stopping forward drive.\n");
+    distance = (int)(get_motor_position_counter(wheels.frontLeft));
+    msleep(10);
+    stop(speed);
+    printf("Drove forward %d ticks at speed %d.\n", abs(distance), speed);
+    printf("-------------------------------\n");
+    return;
 }
 
 void driveBackward(const char *params) {
-    int speed, distance;
-    if (sscanf(params, "%d %d", &speed, &distance) == 2) {
-        if (speed > 0 && distance > 0) {
-            backwardDrive(distance, speed);
-            printf("Drove backward %d units at speed %d.\n", distance, speed);
-        } else {
-            printf("Invalid parameters for drive_backward.\nUsage: drive_backward <speed> <distance>\n");
-        }
-    } else {
-        printf("Invalid parameters for drive_backward.\nUsage: drive_backward <speed> <distance>\n");
+    for (int i = 0; i < 4; i++) {
+        cmpc(i);
     }
+    int speed = atoi(params);
+    mav(wheels.frontLeft, -speed);
+    mav(wheels.backLeft, -speed);
+    mav(wheels.frontRight, -speed);
+    mav(wheels.backRight, -speed);
+    char input;
+    int distance;
+    while (1) {
+        if (read(STDIN_FILENO, &input, 1) == 1) {
+            if (input == '\n') {
+                break; // Exit the loop on Enter key
+            }
+        }
+        msleep(10);
+    }
+    printf("Stopping backward drive.\n");
+    distance = (int)(get_motor_position_counter(wheels.frontLeft));
+    msleep(10);
+    stop(-speed);
+    printf("Drove backward %d ticks at speed %d.\n", abs(distance), speed);
+    printf("-------------------------------\n");
+    return;
 }
 
 void driveRight(const char *params) {
-    int speed, distance;
-    if (sscanf(params, "%d %d", &speed, &distance) == 2) {
-        if (speed > 0 && distance > 0) {
-            rightDrive(distance, speed);
-            printf("Drove right %d units at speed %d.\n", distance, speed);
-        } else {
-            printf("Invalid parameters for drive_right.\nUsage: drive_right <speed> <distance>\n");
-        }
-    } else {
-        printf("Invalid parameters for drive_right.\nUsage: drive_right <speed> <distance>\n");
+    for (int i = 0; i < 4; i++) {
+        cmpc(i);
     }
+    int speed = atoi(params);
+    mav(wheels.frontLeft, -speed);
+    mav(wheels.backLeft, -speed);
+    mav(wheels.frontRight, -speed);
+    mav(wheels.backRight, -speed);
+    char input;
+    int distance;
+    while (1) {
+        if (read(STDIN_FILENO, &input, 1) == 1) {
+            if (input == '\n') {
+                break; // Exit the loop on Enter key
+            }
+        }
+        msleep(10);
+    }
+    printf("Stopping backward drive.\n");
+    distance = (int)(get_motor_position_counter(wheels.frontLeft));
+    msleep(10);
+    stop(-speed);
+    printf("Drove backward %d ticks at speed %d.\n", abs(distance), speed);
+    printf("-------------------------------\n");
+    return;
 }
 
 void driveLeft(const char *params) {
@@ -409,6 +472,11 @@ void clearCommand(const char *params) {
 
 void batteryLevel(const char *params) {
     float battery = power_level() * 100;
+    if (battery_charging()) {
+        printf(GREEN_COLOR "Battery is charging.\n" RESET_COLOR);
+    } else {
+        printf(RED_COLOR "Battery is not charging.\n" RESET_COLOR);
+    }
     printf("Battery level: %.2f%%\n", battery); // Rounds to 2 decimal places
 }
 
@@ -437,7 +505,6 @@ void displaySuccess(const char *message) {
 }
 
 void driveDirection(const char *params) {
-
     int direction, distance, speed;
     if (sscanf(params, "%d %d %d", &direction, &distance, &speed) == 3) {
         if (direction < 0) {
