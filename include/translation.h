@@ -16,10 +16,27 @@ void leftDrive(int units, int speed);
 void angleDrive(int distance, int degrees, int speed);
 void rotationalDrive(int distance, int directionsRadians, int turningRadians, int rotationalSpeed, int translationalSpeed);
 void rotate(int degrees, int speed);
+// void turnRight(int speed, int degrees);
+// void turnLeft(int speed, int degrees);
 void stop(int motorSpeed);
 void backStop(int motorSpeed);
 void rotateStop(int motorSpeed);
 void centerDrive(int targetDistance, int baseSpeed, int kp);
+
+// void driveForward(int speed, int distance);
+// void driveBackward(int speed, int distance);
+// void driveRight(int speed, int distance);
+// void driveLeft(int speed, int distance);
+// void lowerArm();
+// void strafeArm();
+// void pvcArm();
+// void potatoArm();
+// void groundArm();
+// void openPos();
+// void closePos(int position);
+// void closeBox();
+// void driveDirection(int direction, int distance, int speed);
+// void tapeDetection(int speed, int direction);
 
 /* ----- Servo Movement ------- */
 

@@ -1,164 +1,4 @@
-#include "../include/library.h"
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <math.h>
-#include <time.h>
-#include <kipr/wombat.h>
-
-#define TAPE_THRESHOLD 1500
-#define DEGREES_TO_TICKS 9.013888889
-#define STRAFE_CM_TO_TICKS 233.830066338
-#define STRAIGHT_CM_TO_TICKS 232.216295546
-#define MAX_COMMAND_LENGTH 100
-
-#define RESET_COLOR "\033[0m"
-#define GREEN_COLOR "\033[32m"
-#define RED_COLOR "\033[31m"
-#define YELLOW_COLOR "\033[33m"
-#define CYAN_COLOR "\033[36m"
-#define MAGENTA_COLOR "\033[35m"
-
-void displayWelcomeHeader();
-void displayPrompt();
-void displaySuccess(const char *message);
-void driveDirection(const char *params);
-
-// Function prototypes for commands
-void executeCommand(const char *command, const char *params);
-void turnRight(const char *params);
-void turnLeft(const char *params);
-void driveForward(const char *params);
-void driveBackward(const char *params);
-void driveRight(const char *params);
-void driveLeft(const char *params);
-void lowerArm(const char *params);
-void moveArm(const char *params);
-void newServoPos(const char *params);
-void strafeArm(const char *params);
-void pvcArm(const char *params);
-void potatoArm(const char *params);
-void groundArm(const char *params);
-void openPos(const char *params);
-void closePos(const char *params);
-void closeBox(const char *params);
-void helpCommand(const char *params);
-void clearCommand(const char *params);
-void batteryLevel(const char *params);
-void tapeDetection(const char *params);
-
-// Command structure
-typedef struct {
-    const char *name;
-    void (*execute)(const char *params);
-} Command;
-
-// Command table
-const Command commandTable[] = {
-    {"turnRight", turnRight},
-    {"tr", turnRight}, // Alias for turnRight
-    {"turnLeft", turnLeft},
-    {"tl", turnLeft}, // Alias for turnLeft
-    {"driveForward", driveForward},
-    {"df", driveForward}, // Alias for driveForward
-    {"driveBackward", driveBackward},
-    {"db", driveBackward}, // Alias for driveBackward
-    {"driveRight", driveRight},
-    {"dr", driveRight}, // Alias for driveRight
-    {"driveLeft", driveLeft},
-    {"dl", driveLeft}, // Alias for driveLeft
-    {"lowerArm", lowerArm},
-    {"la", lowerArm}, // Alias for lowerArm
-    {"moveArm", moveArm},
-    {"ma", moveArm}, // Alias for moveArm
-    {"moveServo", newServoPos},
-    {"ms", newServoPos}, // Alias for moveServo
-    {"strafePos", strafeArm},
-    {"sp", strafeArm}, // Alias for strafePos
-    {"pvcPos", pvcArm},
-    {"pvc", pvcArm}, // Alias for pvcPos
-    {"potatoPos", potatoArm},
-    {"pp", potatoArm}, // Alias for potatoPos
-    {"groundPos", groundArm},
-    {"gp", groundArm}, // Alias for groundPos
-    {"openPos", openPos},
-    {"op", openPos}, // Alias for openPos
-    {"closePos", closePos},
-    {"cp", closePos}, // Alias for closePos
-    {"closeBox", closeBox},
-    {"cb", closeBox}, // Alias for closeBox
-    {"battery", batteryLevel},
-    {"b", batteryLevel}, // Alias for battery
-    {"help", helpCommand},
-    {"h", helpCommand}, // Alias for help
-    {"ls", helpCommand}, // Alias for help
-    {"clear", clearCommand},
-    {"c", clearCommand}, // Alias for clear
-    {"driveDirection", driveDirection},
-    {"dd", driveDirection}, // Alias for driveDirection
-    {"td", tapeDetection},
-    {"exit", NULL},
-    {"quit", NULL},
-    {NULL, NULL}
-};
-
-int main() {
-    char input[MAX_COMMAND_LENGTH];
-    char command[50];
-    char params[MAX_COMMAND_LENGTH - 50];
-    FILE *inputFile = fopen("values.txt", "r"); // Attempt to open values.txt
-
-    displayWelcomeHeader();
-
-    if (inputFile == NULL) {
-        printf(YELLOW_COLOR "Could not open values.txt. Reading from standard input.\n" RESET_COLOR);
-        inputFile = stdin; // Fallback to stdin if file opening fails
-    } else {
-        printf(GREEN_COLOR "Reading commands from values.txt\n" RESET_COLOR);
-    }
-
-    while (1) {
-        if (inputFile == stdin) {
-            displayPrompt();
-        }
-
-        if (fgets(input, sizeof(input), inputFile) == NULL) {
-            if (inputFile != stdin) {
-                fclose(inputFile);
-            }
-            break; // Exit on EOF or error
-        }
-
-        // Remove trailing newline character
-        input[strcspn(input, "\n")] = 0;
-
-        // Parse the input into command and parameters
-        if (sscanf(input, "%s %[^\n]", command, params) < 1) {
-            if (inputFile != stdin) {
-                 msleep(100); // 1 second delay between lines from file
-            }
-            continue; // Skip empty input
-        }
-
-        if ((strcmp(command, "exit") == 0) || (strcmp(command, "quit") == 0)) {
-            displaySuccess("Exiting Manual Control Mode. Goodbye!");
-            if (inputFile != stdin) {
-                fclose(inputFile);
-            }
-            break;
-        }
-
-        // Execute the command
-        executeCommand(command, params);
-
-        if (inputFile != stdin) {
-            msleep(1000); // 1 second delay between lines from file
-        }
-    }
-
-    return 0;
-}
+#include "../include/second.h"
 
 void executeCommand(const char *command, const char *params) {
     for (int i = 0; commandTable[i].name != NULL; i++) {
@@ -182,7 +22,7 @@ void turnRight(const char *params) {
     int speed, degrees;
     if (sscanf(params, "%d %d", &speed, &degrees) == 2) {
         if (speed > 0 && degrees > 0) {
-            rotate(DEGREES_TO_TICKS * -degrees * 1.085, -speed);
+            rotate(DEGREES_TO_TICKS * -degrees, -speed);
             printf("Turned right %d degrees at speed %d.\n", degrees, speed);
         } else {
             printf("Invalid parameters for turn_right.\nUsage: turn_right <speed> <degrees>\n");
@@ -203,34 +43,17 @@ void turnLeft(const char *params) {
     int speed, degrees;
     if (sscanf(params, "%d %d", &speed, &degrees) == 2) {
         if (speed > 0 && degrees > 0) {
-            move_relative_position(wheels.frontLeft, speed / 4, 5 * DEGREES_TO_TICKS);
-            move_relative_position(wheels.backLeft, speed / 4, 5 * DEGREES_TO_TICKS);
-            move_relative_position(wheels.frontRight, -speed / 4, -5 * DEGREES_TO_TICKS);
-            move_relative_position(wheels.backRight, -speed / 4, -5 * DEGREES_TO_TICKS);
-            while (get_motor_done(wheels.frontLeft) == 0 && get_motor_done(wheels.frontRight) == 0 && get_motor_done(wheels.backLeft) == 0 && get_motor_done(wheels.backRight) == 0) {
-                msleep(10);
-            }
-            move_relative_position(wheels.frontLeft, speed, DEGREES_TO_TICKS * degrees * 1.25 - (15 * DEGREES_TO_TICKS));
-            move_relative_position(wheels.backLeft, speed, DEGREES_TO_TICKS * degrees * 1.25 - (15 * DEGREES_TO_TICKS));
-            move_relative_position(wheels.frontRight, (-1) * speed, (-1) * DEGREES_TO_TICKS * degrees * 1.25 + (15 * DEGREES_TO_TICKS));
-            move_relative_position(wheels.backRight, (-1) * speed, (-1) * DEGREES_TO_TICKS * degrees * 1.25 + (15 * DEGREES_TO_TICKS));
-            while (get_motor_done(wheels.frontLeft) == 0 && get_motor_done(wheels.frontRight) == 0 && get_motor_done(wheels.backLeft) == 0 && get_motor_done(wheels.backRight) == 0) {
-                msleep(10);
-            }
-            move_relative_position(wheels.frontLeft, speed / 2, (10 * DEGREES_TO_TICKS));
-            move_relative_position(wheels.backLeft, speed / 2, (10 * DEGREES_TO_TICKS));
-            move_relative_position(wheels.frontRight, (-1) * speed / 2, -(10 * DEGREES_TO_TICKS));
-            move_relative_position(wheels.backRight, (-1) * speed / 2, -(10 * DEGREES_TO_TICKS));
-            
-            mav(wheels.frontLeft, (-1) * speed);
-            mav(wheels.backLeft, (-1) * speed);
-            mav(wheels.frontRight, speed);
-            mav(wheels.backRight, speed);
-            msleep(50);
-            ao();
+            rotate(DEGREES_TO_TICKS * degrees, speed);
             printf("Turned left %d degrees at speed %d.\n", degrees, speed);
         } else {
             printf("Invalid parameters for turn_left. Usage: turn_left <speed> <degrees>\n");
+        }
+    } else if (sscanf(params, "%d", &degrees) == 1) {
+        if (degrees > 0) {
+            rotate(DEGREES_TO_TICKS * degrees, 1500);
+            printf("Turned left %d degrees at speed 1500.\n", degrees);
+        } else {
+            printf("Invalid parameters for turn_left. Usage: turn_left <degrees>\n");
         }
     } else {
         printf("Invalid parameters for turn_left. Usage: turn_left <speed> <degrees>\n");
@@ -238,73 +61,57 @@ void turnLeft(const char *params) {
 }
 
 void driveForward(const char *params) {
-    int speed;
-    float distance;
-    if (sscanf(params, "%d %f", &speed, &distance) == 2)
-    {
+    int speed, distance;
+    if (sscanf(params, "%d %d", &speed, &distance) == 2) {
         if (speed > 0 && distance > 0) {
             forwardDrive(distance * STRAIGHT_CM_TO_TICKS, speed);
-            printf("Drove forward %f inches at speed %d.\n", distance, speed);
+            printf("Drove forward %d inches at speed %d.\n", distance, speed);
         } else {
             printf("Invalid parameters for drive_forward.\nUsage: drive_forward <speed> <distance>\n");
         }
-    }
-    else
-    {
+    } else {
         printf("Invalid parameters for drive_forward.\nUsage: drive_forward <speed> <distance>\n");
     }
 }
 
 void driveBackward(const char *params) {
-    int speed;
-    float distance;
-    if (sscanf(params, "%d %f", &speed, &distance) == 2)
-    {
+    int speed, distance;
+    if (sscanf(params, "%d %d", &speed, &distance) == 2) {
         if (speed > 0 && distance > 0) {
             backwardDrive(distance * STRAIGHT_CM_TO_TICKS, speed);
-            printf("Drove backward %f inches at speed %d.\n", distance, speed);
+            printf("Drove backward %d inches at speed %d.\n", distance, speed);
         } else {
             printf("Invalid parameters for drive_backward.\nUsage: drive_backward <speed> <distance>\n");
         }
-    }
-    else
-    {
+    } else {
         printf("Invalid parameters for drive_backward.\nUsage: drive_backward <speed> <distance>\n");
     }
 }
 
 void driveRight(const char *params) {
-    int speed;
-    float distance;
-    if (sscanf(params, "%d %f", &speed, &distance) == 2)
-    {
+    int speed, distance;
+    if (sscanf(params, "%d %d", &speed, &distance) == 2) {
         if (speed > 0 && distance > 0) {
-            rightDrive(distance * STRAFE_CM_TO_TICKS * 240, speed);
-            printf("Drove right %f units at speed %d.\n", distance, speed);
+            rightDrive(distance * STRAFE_CM_TO_TICKS, speed);
+            printf("Drove right %d units at speed %d.\n", distance, speed);
         } else {
             printf("Invalid parameters for drive_right.\nUsage: drive_right <speed> <distance>\n");
         }
-    }
-    else
-    {
+    } else {
         printf("Invalid parameters for drive_right.\nUsage: drive_right <speed> <distance>\n");
     }
 }
 
 void driveLeft(const char *params) {
-    int speed;
-    float distance;
-    if (sscanf(params, "%d %f", &speed, &distance) == 2)
-    {
+    int speed, distance;
+    if (sscanf(params, "%d %d", &speed, &distance) == 2) {
         if (speed > 0 && distance > 0) {
             leftDrive(distance * STRAFE_CM_TO_TICKS, speed);
-            printf("Drove left %f units at speed %d.\n", distance, speed);
+            printf("Drove left %d units at speed %d.\n", distance, speed);
         } else {
             printf("Invalid parameters for drive_left. Usage: drive_left <speed> <distance>\n");
         }
-    }
-    else
-    {
+    } else {
         printf("Invalid parameters for drive_left. Usage: drive_left <speed> <distance>\n");
     }
 }
@@ -359,7 +166,7 @@ void strafeArm(const char *params) {
     // No parameters needed for this command
     runServoThreads((ServoParams[]){
             {servos.shoulder, shoulderPos.strafe, 2},
-            {servos.elbow, 0, 1},
+            {servos.elbow, 100, 1},
             {servos.wrist, wristPos.strafe, 2}},
         3);
     msleep(1700);
@@ -522,7 +329,7 @@ void driveDirection(const char *params) {
             rearLeftSpeed = (int)(rearLeftSpeed * scaleFactor);
             rearRightSpeed = (int)(rearRightSpeed * scaleFactor);
             printf("frontLeftSpeed: %d,\nfrontRightSpeed: %d,\nrearLeftSpeed: %d,\nrearRightSpeed: %d,\n", frontLeftSpeed, frontRightSpeed, rearLeftSpeed, rearRightSpeed);
-            distance = distance * 228;
+
             // Call the appropriate drive functions
             move_relative_position(wheels.frontLeft, frontLeftSpeed, (frontLeftSpeed < 0) ? -distance : distance);
             move_relative_position(wheels.frontRight, frontRightSpeed, (frontRightSpeed < 0) ? -distance : distance);
