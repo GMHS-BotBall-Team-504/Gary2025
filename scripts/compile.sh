@@ -12,14 +12,11 @@ DEPLOY_DIR="/home/kipr/comp"
 SRC_DIR="$BASE_DIR/src" 
 
 # Array of executables to build
-EXECUTABLES=("manual" "auto" "main" "start")
+EXECUTABLES=("main")
 SRC_FILES=(
-    "src/manual.c src/ports.c src/positions.c src/servos.c src/tasks.c src/threads.c src/translation.c"
-    "src/auto.c src/ports.c src/positions.c src/servos.c src/tasks.c src/threads.c src/translation.c"
     "src/main.c src/ports.c src/positions.c src/servos.c src/tasks.c src/threads.c src/translation.c"
-    "src/start.c"
-)
 
+)
 cd "$BASE_DIR/.."
 sudo rm -rf "$BUILD_DIR"
 sleep 0.1 

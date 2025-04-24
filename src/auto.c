@@ -174,7 +174,7 @@ void turnRight(const char *params) {
         msleep(10);
     }
     printf("Stopping rotation.\n");
-    distance = (int)(get_motor_position_counter(wheels.frontLeft) / DEGREES_TO_TICKS);
+    distance = (int)((get_motor_position_counter(wheels.frontLeft)+get_motor_position_counter(wheels.frontRight)+get_motor_position_counter(wheels.backLeft)+get_motor_position_counter(wheels.backRight)) / DEGREES_TO_TICKS / 4);
     move_at_velocity(wheels.frontLeft, speed);
     move_at_velocity(wheels.backLeft, speed);
     move_at_velocity(wheels.frontRight, -speed);
@@ -246,7 +246,6 @@ void driveForward(const char *params) {
     }
     printf("Stopping forward drive.\n");
     distance = (int)(get_motor_position_counter(wheels.frontLeft));
-    msleep(10);
     stop(speed);
     printf("Drove forward %d ticks at speed %d.\n", abs(distance), speed);
     printf("-------------------------------\n");
@@ -274,7 +273,6 @@ void driveBackward(const char *params) {
     }
     printf("Stopping backward drive.\n");
     distance = (int)(get_motor_position_counter(wheels.frontLeft));
-    msleep(10);
     stop(-speed);
     printf("Drove backward %d ticks at speed %d.\n", abs(distance), speed);
     printf("-------------------------------\n");
@@ -287,8 +285,8 @@ void driveRight(const char *params) {
     }
     int speed = atoi(params);
     mav(wheels.frontLeft, -speed);
-    mav(wheels.backLeft, -speed);
-    mav(wheels.frontRight, -speed);
+    mav(wheels.backLeft, speed);
+    mav(wheels.frontRight, speed);
     mav(wheels.backRight, -speed);
     char input;
     int distance;
@@ -300,27 +298,49 @@ void driveRight(const char *params) {
         }
         msleep(10);
     }
-    printf("Stopping backward drive.\n");
+    printf("Stopping right drive.\n");
     distance = (int)(get_motor_position_counter(wheels.frontLeft));
-    msleep(10);
-    stop(-speed);
-    printf("Drove backward %d ticks at speed %d.\n", abs(distance), speed);
+    mav(wheels.frontLeft, speed);
+    mav(wheels.backLeft, -speed);
+    mav(wheels.frontRight, -speed);
+    mav(wheels.backRight, speed);
+    msleep(30);
+    ao();
+    printf("Drove right %d ticks at speed %d.\n", abs(distance), speed);
     printf("-------------------------------\n");
     return;
 }
 
 void driveLeft(const char *params) {
-    int speed, distance;
-    if (sscanf(params, "%d %d", &speed, &distance) == 2) {
-        if (speed > 0 && distance > 0) {
-            leftDrive(distance, speed);
-            printf("Drove left %d units at speed %d.\n", distance, speed);
-        } else {
-            printf("Invalid parameters for drive_left. Usage: drive_left <speed> <distance>\n");
-        }
-    } else {
-        printf("Invalid parameters for drive_left. Usage: drive_left <speed> <distance>\n");
+    for (int i = 0; i < 4; i++) {
+        cmpc(i);
     }
+    int speed = atoi(params);
+    mav(wheels.frontLeft, speed);
+    mav(wheels.backLeft, -speed);
+    mav(wheels.frontRight, -speed);
+    mav(wheels.backRight, speed);
+    char input;
+    int distance;
+    while (1) {
+        if (read(STDIN_FILENO, &input, 1) == 1) {
+            if (input == '\n') {
+                break; // Exit the loop on Enter key
+            }
+        }
+        msleep(10);
+    }
+    printf("Stopping left drive.\n");
+    distance = (int)(get_motor_position_counter(wheels.frontLeft));
+    mav(wheels.frontLeft, -speed);
+    mav(wheels.backLeft, speed);
+    mav(wheels.frontRight, speed);
+    mav(wheels.backRight, -speed);
+    msleep(30);
+    ao();
+    printf("Drove left %d ticks at speed %d.\n", abs(distance), speed);
+    printf("-------------------------------\n");
+    return;
 }
 
 void lowerArm(const char *params) {
@@ -372,11 +392,11 @@ void newServoPos(const char *params) {
 void strafeArm(const char *params) {
     // No parameters needed for this command
     runServoThreads((ServoParams[]){
-            {servos.shoulder, shoulderPos.strafe, 2},
-            {servos.elbow, 400, 2},
-            {servos.wrist, wristPos.strafe, 2}},
-        3);
-    msleep(500);
+        {servos.shoulder, shoulderPos.strafe, 2},
+        {servos.elbow, 100, 1},
+        {servos.wrist, wristPos.strafe, 2}},
+    3);
+    msleep(1700);
     runServoThreads((ServoParams[]){
                         {servos.shoulder, shoulderPos.strafe, 2},
                         {servos.elbow, elbowPos.strafe, 2}},
@@ -505,12 +525,15 @@ void displaySuccess(const char *message) {
 }
 
 void driveDirection(const char *params) {
-    int direction, distance, speed;
-    if (sscanf(params, "%d %d %d", &direction, &distance, &speed) == 3) {
+    int direction, speed;
+    for (int i = 0; i < 4; i++) {
+        cmpc(i);
+    }
+    if (sscanf(params, "%d %d", &direction, &speed) == 2) {
         if (direction < 0) {
             direction = (direction % 360 + 360) % 360; // Convert negative direction to positive
         }
-        if (direction >= 0 && direction <= 360 && distance > 0 && speed > 0) {
+        if (direction >= 0 && direction <= 360 && speed > 0) {
             // Calculate wheel speeds based on direction
             double rad = direction * (M_PI / 180.0);
             double cos_dir = cos(rad);
@@ -541,13 +564,23 @@ void driveDirection(const char *params) {
             printf("frontLeftSpeed: %d,\nfrontRightSpeed: %d,\nrearLeftSpeed: %d,\nrearRightSpeed: %d,\n", frontLeftSpeed, frontRightSpeed, rearLeftSpeed, rearRightSpeed);
 
             // Call the appropriate drive functions
-            move_relative_position(wheels.frontLeft, frontLeftSpeed, (frontLeftSpeed < 0) ? -distance : distance);
-            move_relative_position(wheels.frontRight, frontRightSpeed, (frontRightSpeed < 0) ? -distance : distance);
-            move_relative_position(wheels.backLeft, rearLeftSpeed, (rearLeftSpeed < 0) ? -distance : distance);
-            move_relative_position(wheels.backRight, rearRightSpeed, (rearRightSpeed < 0) ? -distance : distance);
-            while (get_motor_done(wheels.frontLeft) == 0 && get_motor_done(wheels.frontRight) == 0 && get_motor_done(wheels.backLeft) == 0 && get_motor_done(wheels.backRight) == 0) {
+            move_at_velocity(wheels.frontLeft, frontLeftSpeed);
+            move_at_velocity(wheels.frontRight, frontRightSpeed);
+            move_at_velocity(wheels.backLeft, rearLeftSpeed);
+            move_at_velocity(wheels.backRight, rearRightSpeed);
+            
+            char input;
+            int distance;
+            while (1) {
+                if (read(STDIN_FILENO, &input, 1) == 1) {
+                    if (input == '\n') {
+                        break; // Exit the loop on Enter key
+                    }
+                }
                 msleep(10);
             }
+            printf("Stopping drive.\n");
+            distance = (int)(get_motor_position_counter(wheels.frontLeft));
             mav(wheels.frontLeft, (-1) * frontLeftSpeed);
             mav(wheels.frontRight, (-1) * frontRightSpeed);
             mav(wheels.backLeft, (-1) * rearLeftSpeed);

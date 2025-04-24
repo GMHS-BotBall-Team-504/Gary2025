@@ -1,9 +1,28 @@
 #include "../include/library.h"
 #include <math.h>
+#include <pthread.h>
+
+typedef struct {
+    int distance;
+    double speed;
+} driveArgs;
+
+void* driveForwardThread(void* args) {
+    driveArgs* arguments = (driveArgs*)args;
+    driveForward(arguments->distance, arguments->speed);
+    return NULL;
+}
+
+void* driveBackwardThread(void* args) {
+    driveArgs* arguments = (driveArgs*)args;
+    driveBackward(arguments->distance, arguments->speed);
+    return NULL;
+}
+
 #define TAPE_THRESHOLD 1500
 #define DEGREES_TO_TICKS 9.013888889
-#define STRAFE_CM_TO_TICKS 143.614670791
-#define STRAIGHT_CM_TO_TICKS 130.0000
+#define STRAFE_CM_TO_TICKS 233.830066338
+#define STRAIGHT_CM_TO_TICKS 232.216295546
 // 3425 seems to be 360 degrees
 
 int main() {
@@ -15,13 +34,104 @@ int main() {
     |  Pre - Run Tasks
     | ################################################################### */
 
-    startUp();
-    while (analog(analogPorts.startLight) > 1200) {
-        msleep(10);
+    pthread_t driveThread, servoThread;
+
+    {
+        // Arguments for driveForward
+        driveArgs arguments = {1500, 50 / STRAIGHT_CM_TO_TICKS};
+
+        // Create threads
+        pthread_create(&driveThread, NULL, driveForwardThread, (void*)&arguments);
+        pthread_create(&servoThread, NULL, (void *(*)(void *))openPos, NULL);
+
+        // Wait for both threads to finish
+        pthread_join(driveThread, NULL);
+
+        driveDirection(90, 4000, 1500);
+        pthread_join(servoThread, NULL);
     }
-    printf("Alright, I'm ready to go!\n");
-    getchar();
-    shut_down_in(119);
+    printf("scuff 1");
+    {
+        // Arguments for driveBackwards
+        driveArgs arguments = {1500, 50 / STRAIGHT_CM_TO_TICKS};
+
+        // Create threads
+        pthread_create(&driveThread, NULL, driveBackwardThread, (void*)&arguments);
+        pthread_create(&servoThread, NULL, (void* (*)(void*))openPos, NULL);
+
+        // Wait for both threads to finish
+        pthread_join(driveThread, NULL);
+        pthread_join(servoThread, NULL);
+    }
+
+    return 0;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // startUp();
+    // while (analog(analogPorts.startLight) > 1200) {
+    //     msleep(10);
+    // }
+    // printf("Alright, I'm ready to go!\n");
+    // getchar();
+    // shut_down_in(119);
 
 
     /* ##################################################################

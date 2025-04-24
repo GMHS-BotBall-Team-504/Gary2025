@@ -5,19 +5,18 @@ clear
 # Define directories and variables
 BASE_DIR="$( cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd )"
 BUILD_DIR="$BASE_DIR/out/build"
-KIPR_ROBOT_IP="10.0.0.250"
+KIPR_ROBOT_IP="192.168.125.1"
 KIPR_ROBOT_USER="kipr"
 KIPR_ROBOT_PASS="botball"
 DEPLOY_DIR="/home/kipr/comp"
 SRC_DIR="$BASE_DIR/src" 
 
 # Array of executables to build
-EXECUTABLES=("manual" "auto" "main" "start")
+EXECUTABLES=("manual" "auto")
 SRC_FILES=(
+    # "src/main.c src/ports.c src/positions.c src/servos.c src/tasks.c src/threads.c src/translation.c"
     "src/manual.c src/ports.c src/positions.c src/servos.c src/tasks.c src/threads.c src/translation.c"
     "src/auto.c src/ports.c src/positions.c src/servos.c src/tasks.c src/threads.c src/translation.c"
-    "src/main.c src/ports.c src/positions.c src/servos.c src/tasks.c src/threads.c src/translation.c"
-    "src/start.c"
 )
 
 cd "$BASE_DIR/.."
@@ -49,14 +48,18 @@ for ((i=0; i<${#EXECUTABLES[@]}; i++)); do
         sillyfreak/wombat-cross aarch64-linux-gnu-gcc -g -Wall -pthread  \
         $SOURCE_FILES -lkipr -lm -o $EXECUTABLE
     echo ""
-
 done
+
 current_directory=$(pwd)
 echo "The current directory is: $current_directory"
 
 # Deploy executables
 sshpass -p "$KIPR_ROBOT_PASS" scp \
-    "scripts/out/build/manual" "scripts/out/build/auto" "scripts/out/build/main" "scripts/out/build/start" \
+    "scripts/out/build/manual" "scripts/out/build/auto" \
+    "$KIPR_ROBOT_USER@$KIPR_ROBOT_IP:$DEPLOY_DIR"
+
+sshpass -p "$KIPR_ROBOT_PASS" scp \
+    "scripts/values.txt" \
     "$KIPR_ROBOT_USER@$KIPR_ROBOT_IP:$DEPLOY_DIR"
 
 sleep 0.1
