@@ -58,6 +58,29 @@ void* rightDriveThread(void*arg) {
     return NULL;
 }
 
+// Wrapper function for leftDrive
+void* leftDriveThread(void* arg) {
+    int* params = (int*) arg; // Cast the argument to an int array
+    int units = params[0];   // Extract the units
+    int speed = params[1];   // Extract the speed
+    printf("Starting left drive: units=%d, speed=%d\n", units, speed);
+    leftDrive(units, speed); // Call the leftDrive function
+    printf("Left drive complete.\n");
+    return NULL;
+}
+
+// Wrapper function for driveDirection
+void* driveDirectionThread(void* arg) {
+    int* params = (int*) arg; // Cast the argument to an int array
+    int direction = params[0]; // Extract the direction
+    int distance = params[1];  // Extract the distance
+    int speed = params[2];     // Extract the speed
+    printf("Starting drive direction: direction=%d, distance=%d, speed=%d\n", direction, distance, speed);
+    driveDirection(direction, distance, speed); // Call the driveDirection function
+    printf("Drive direction complete.\n");
+    return NULL;
+}
+
 void* runServoThreadsWrapper(void* arg) {
     ServoThreadArgs* args = (ServoThreadArgs*) arg;
     runServoThreads(args->params, args->count);

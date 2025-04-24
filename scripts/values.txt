@@ -1,24 +1,24 @@
-cp
-sp
-df 1000 0.5
-dd 90 10 1500
-df 1500 1
-tl 1500 176
-dd -90 5 1500
-db 1500 2
-op
-gp
-df 1500 13
-tl 200 44
-cp
-sp
-tl 1500 57
-pvc
-op
-sp
-tr 1500 69
-dd -90 5 1500
-df 1500 0.5
-dd -90 5 1500
-df 1000 2
-gp
+closePos
+strafePos
+driveForward 1000 0.5
+driveDirection 90 10 1500
+driveForward 1500 1
+turnLeft 150 176
+driveDirection -90 5 1500
+driveBackwards 1500 2
+openPos
+groundPos
+driveForward 1500 3
+turnLeft 200 44
+closePos
+strafePos
+turnLeft 1500 57
+pvcPos
+openPos
+strafePos
+turnRight 1500 69
+driveDirection -90 5 1500
+driveForward 1500 0.5
+driveDirection -90 5 1500
+driveForward 1000 2
+groundPos

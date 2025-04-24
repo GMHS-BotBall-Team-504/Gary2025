@@ -11,6 +11,8 @@ void* backwardDriveThread(void* arg);
 void* rotateThread(void* arg);
 void* centerDriveThread(void* arg);
 void* rightDriveThread(void* arg);
+void* leftDriveThread(void* arg);
+void* driveDirectionThread(void* arg);
 
 void* runServoThreadsWrapper(void* arg);
 void* verticalArmWrapper(void* arg);

@@ -15,42 +15,6 @@
 
 /* ----- Translational Movement ----- */
 
-/*! @brief Drives the robot in a direction based on the given angle and speed
- * @param angle Angle in degrees
- * @param speed Translational speed
- * @param omega Angular velocity (rotation speed)
- * @param maxSpeed Maximum speed for the wheels
- * @details The robot will move in the direction specified by the angle, with the given translational speed and angular velocity.
- */
-void angularDrive(float angle, float speed, float omega, int maxSpeed) {
-    // Calculate vx and vy based on the angle and speed
-    float vx = speed * cos(angle); // X-component of velocity
-    float vy = speed * sin(angle); // Y-component of velocity
-
-    // Calculate the speeds for each wheel
-    int frontLeftSpeed = (int)(vx + vy + omega);
-    int backLeftSpeed = (int)(vx - vy + omega);
-    int frontRightSpeed = (int)(vx - vy - omega);
-    int backRightSpeed = (int)(vx + vy - omega);
-
-    // Normalize speeds to ensure they don't exceed maxSpeed
-    int maxWheelSpeed = fmax(fmax(abs(frontLeftSpeed), abs(frontRightSpeed)),
-                             fmax(abs(backLeftSpeed), abs(backRightSpeed)));
-    if (maxWheelSpeed > maxSpeed) {
-        frontLeftSpeed = frontLeftSpeed * maxSpeed / maxWheelSpeed;
-        frontRightSpeed = frontRightSpeed * maxSpeed / maxWheelSpeed;
-        backLeftSpeed = backLeftSpeed * maxSpeed / maxWheelSpeed;
-        backRightSpeed = backRightSpeed * maxSpeed / maxWheelSpeed;
-    }
-
-    // Set motor speeds
-    mav(wheels.frontLeft, frontLeftSpeed);
-    mav(wheels.frontRight, frontRightSpeed);
-    mav(wheels.backLeft, backLeftSpeed);
-    mav(wheels.backRight, backRightSpeed);
-}
-
-
 void crash(int backLeft, int backRight, int frontLeft, int frontRight) {
     mav(wheels.backLeft, (-1) * backLeft);
     mav(wheels.backRight, (-1) * backRight);
@@ -100,14 +64,70 @@ void alignBack(int ticksPerSecond) {
 /// @param units Target ticks traveled
 /// @param speed Speed in ticks/s
 /// @details The robot will move forward at the given speed for the given number of ticks
-void forwardDrive(int units, int speed) {
-    move_relative_position(wheels.frontLeft, constant * speed, constant * units);
-    move_relative_position(wheels.backLeft, constant * speed, constant * units);
-    move_relative_position(wheels.frontRight, speed, units);
-    move_relative_position(wheels.backRight, speed, units);
-    block_motor_done(0);
-    msleep(10);
-    stop(speed);
+void forwardDrive(int units, int maxSpeed) {
+    // Clear motor position counters
+    clear_motor_position_counter(wheels.frontLeft);
+    clear_motor_position_counter(wheels.backLeft);
+    clear_motor_position_counter(wheels.frontRight);
+    clear_motor_position_counter(wheels.backRight);
+
+    int currentSpeed = 0;
+    int acceleration_distance = units * 0.15; // 15% of distance for acceleration
+    int deceleration_distance = units * 0.15; // 15% of distance for deceleration
+    int constant_speed_distance = units - acceleration_distance - deceleration_distance;
+
+    // Adjust distances for very short drives
+    if (units < 200) { // For shorter distances, use a fixed smaller acceleration/deceleration distance
+        acceleration_distance = units / 3;
+        deceleration_distance = units / 3;
+        constant_speed_distance = units - acceleration_distance - deceleration_distance;
+        if (constant_speed_distance < 0) constant_speed_distance = 0;
+    } else { // For longer distances, ensure minimum acceleration/deceleration distance
+        if (acceleration_distance < 100) acceleration_distance = 100;
+        if (deceleration_distance < 100) deceleration_distance = 100;
+        constant_speed_distance = units - acceleration_distance - deceleration_distance;
+        if (constant_speed_distance < 0) constant_speed_distance = 0;
+    }
+
+
+    // Gradual acceleration
+    while (get_motor_position_counter(wheels.frontLeft) < acceleration_distance) {
+        currentSpeed = (int)(((float)get_motor_position_counter(wheels.frontLeft) / acceleration_distance) * maxSpeed);
+        if (currentSpeed > maxSpeed) currentSpeed = maxSpeed;
+        if (currentSpeed < 50 && get_motor_position_counter(wheels.frontLeft) > 0) currentSpeed = 50; // Ensure minimum speed
+
+        mav(wheels.frontLeft, constant * currentSpeed);
+        mav(wheels.backLeft, constant * currentSpeed);
+        mav(wheels.frontRight, currentSpeed);
+        mav(wheels.backRight, currentSpeed);
+        msleep(10);
+    }
+
+    // Drive at max speed
+    while (get_motor_position_counter(wheels.frontLeft) < acceleration_distance + constant_speed_distance) {
+        mav(wheels.frontLeft, constant * maxSpeed);
+        mav(wheels.backLeft, constant * maxSpeed);
+        mav(wheels.frontRight, maxSpeed);
+        mav(wheels.backRight, maxSpeed);
+        msleep(10);
+    }
+
+    // Gradual deceleration
+    while (get_motor_position_counter(wheels.frontLeft) < units) {
+        int distance_into_deceleration = get_motor_position_counter(wheels.frontLeft) - (units - deceleration_distance);
+        currentSpeed = maxSpeed - (int)(((float)distance_into_deceleration / deceleration_distance) * maxSpeed);
+        if (currentSpeed < 0) currentSpeed = 0;
+        if (currentSpeed < 50 && get_motor_position_counter(wheels.frontLeft) < units) currentSpeed = 50; // Ensure minimum speed
+
+        mav(wheels.frontLeft, constant * currentSpeed);
+        mav(wheels.backLeft, constant * currentSpeed);
+        mav(wheels.frontRight, currentSpeed);
+        mav(wheels.backRight, currentSpeed);
+        msleep(10);
+    }
+
+    // Stop the motors
+    stop(maxSpeed); // Use the stop function to apply a brief counter-movement
     return;
 }
 
@@ -123,99 +143,205 @@ void backwardDrive(int units, int speed) {
     backStop(speed);
 }
 
-void rightDrive(int units, int speed) {
-    move_relative_position(wheels.frontLeft, -1 * speed, -1 * units);
-    move_relative_position(wheels.backLeft, 1 * speed, 1 * units);
-    move_relative_position(wheels.frontRight, 1 * speed, 1 * units);
-    move_relative_position(wheels.backRight, -1 * speed, -1 * units);
-    block_motor_done(0);
-    msleep(10);
+void rightDrive(int units, int maxSpeed) {
+    // Clear motor position counters
+    clear_motor_position_counter(wheels.frontLeft);
+    clear_motor_position_counter(wheels.backLeft);
+    clear_motor_position_counter(wheels.frontRight);
+    clear_motor_position_counter(wheels.backRight);
 
-    move_relative_position(wheels.frontLeft, 1 * speed, 1 * units);
-    move_relative_position(wheels.backLeft, -1 * speed, -1 * units);
-    move_relative_position(wheels.frontRight, -1 * speed, -1 * units);
-    move_relative_position(wheels.backRight, 1 * speed, 1 * units);
-    msleep(30);
-    ao();
-}
+    int currentSpeed = 0;
+    int acceleration_distance = abs(units) * 0.15; // 15% of distance for acceleration
+    int deceleration_distance = abs(units) * 0.15; // 15% of distance for deceleration
+    int constant_speed_distance = abs(units) - acceleration_distance - deceleration_distance;
 
-void leftDrive(int units, int speed) {
-    move_relative_position(wheels.frontLeft, 1 * speed, 1 * units);
-    move_relative_position(wheels.backLeft, -1 * speed, -1 * units);
-    move_relative_position(wheels.frontRight, -1 * speed, -1 * units);
-    move_relative_position(wheels.backRight, 1 * speed, 1 * units);
-    block_motor_done(0);
-    msleep(10);
-    
-    move_relative_position(wheels.frontLeft, -1 * speed, -1 * units);
-    move_relative_position(wheels.backLeft, 1 * speed, 1 * units);
-    move_relative_position(wheels.frontRight, 1 * speed, 1 * units);
-    move_relative_position(wheels.backRight, -1 * speed, -1 * units);
-    msleep(30);
-    ao();
-}
-
-/*! \brief Translates the robot in any direction;
- *         360 degrees;
- *         Cannot rotate
- *
- *  blah blah blah
- * 
- * @param distance Target cm traveled
- * @param radians Angle in radians to turn
- * @param speed Speed in cm/s
- */
-void angleDrive(int distance, int degrees, int speed) {
-    // Converting degrees into radians
-    float radians = degrees * M_PI / 180;
-
-    // Calculate motor speeds based on direction
-    int topRight = sin(radians - M_PI/4) * speed;
-    int topLeft = sin(radians + M_PI/4) * speed;
-
-    move_relative_position(wheels.frontLeft, topLeft, distance);
-    move_relative_position(wheels.backLeft, topRight, distance);
-    move_relative_position(wheels.frontRight, topRight, distance);
-    move_relative_position(wheels.backRight, topLeft, distance);
-
-    for (int i = 0; i < 4; i++) {
-        block_motor_done(i);
+    // Adjust distances for very short drives
+    if (abs(units) < 200) { // For shorter distances, use a fixed smaller acceleration/deceleration distance
+        acceleration_distance = abs(units) / 3;
+        deceleration_distance = abs(units) / 3;
+        constant_speed_distance = abs(units) - acceleration_distance - deceleration_distance;
+        if (constant_speed_distance < 0) constant_speed_distance = 0;
+    } else { // For longer distances, ensure minimum acceleration/deceleration distance
+        if (acceleration_distance < 100) acceleration_distance = 100;
+        if (deceleration_distance < 100) deceleration_distance = 100;
+        constant_speed_distance = abs(units) - acceleration_distance - deceleration_distance;
+        if (constant_speed_distance < 0) constant_speed_distance = 0;
     }
-    msleep(10);
+
+    // Gradual acceleration
+    while (abs(get_motor_position_counter(wheels.frontLeft)) < acceleration_distance) {
+        currentSpeed = (int)(((float)abs(get_motor_position_counter(wheels.frontLeft)) / acceleration_distance) * maxSpeed);
+        if (currentSpeed > maxSpeed) currentSpeed = maxSpeed;
+        if (currentSpeed < 50 && abs(get_motor_position_counter(wheels.frontLeft)) > 0) currentSpeed = 50; // Ensure minimum speed
+
+        mav(wheels.frontLeft, -currentSpeed);
+        mav(wheels.backLeft, currentSpeed);
+        mav(wheels.frontRight, currentSpeed);
+        mav(wheels.backRight, -currentSpeed);
+        msleep(10);
+    }
+
+    // Drive at max speed
+    while (abs(get_motor_position_counter(wheels.frontLeft)) < acceleration_distance + constant_speed_distance) {
+        mav(wheels.frontLeft, -maxSpeed);
+        mav(wheels.backLeft, maxSpeed);
+        mav(wheels.frontRight, maxSpeed);
+        mav(wheels.backRight, -maxSpeed);
+        msleep(10);
+    }
+
+    // Gradual deceleration
+    while (abs(get_motor_position_counter(wheels.frontLeft)) < abs(units)) {
+        int distance_into_deceleration = abs(get_motor_position_counter(wheels.frontLeft)) - (abs(units) - deceleration_distance);
+        currentSpeed = maxSpeed - (int)(((float)distance_into_deceleration / deceleration_distance) * maxSpeed);
+        if (currentSpeed < 0) currentSpeed = 0;
+        if (currentSpeed < 50 && abs(get_motor_position_counter(wheels.frontLeft)) < abs(units)) currentSpeed = 50; // Ensure minimum speed
+
+        mav(wheels.frontLeft, -currentSpeed);
+        mav(wheels.backLeft, currentSpeed);
+        mav(wheels.frontRight, currentSpeed);
+        mav(wheels.backRight, -currentSpeed);
+        msleep(10);
+    }
+
+    // Stop the motors
+    ao();
     return;
 }
 
-/// @brief
-void rotationalDrive(int distance, int directionsRadians, int turningRadians, int rotationalSpeed, int translationalSpeed) {
+void leftDrive(int units, int maxSpeed) {
+    // Clear motor position counters
+    clear_motor_position_counter(wheels.frontLeft);
+    clear_motor_position_counter(wheels.backLeft);
+    clear_motor_position_counter(wheels.frontRight);
+    clear_motor_position_counter(wheels.backRight);
 
+    int currentSpeed = 0;
+    int acceleration_distance = abs(units) * 0.15; // 15% of distance for acceleration
+    int deceleration_distance = abs(units) * 0.15; // 15% of distance for deceleration
+    int constant_speed_distance = abs(units) - acceleration_distance - deceleration_distance;
+
+    // Adjust distances for very short drives
+    if (abs(units) < 200) { // For shorter distances, use a fixed smaller acceleration/deceleration distance
+        acceleration_distance = abs(units) / 3;
+        deceleration_distance = abs(units) / 3;
+        constant_speed_distance = abs(units) - acceleration_distance - deceleration_distance;
+        if (constant_speed_distance < 0) constant_speed_distance = 0;
+    } else { // For longer distances, ensure minimum acceleration/deceleration distance
+        if (acceleration_distance < 100) acceleration_distance = 100;
+        if (deceleration_distance < 100) deceleration_distance = 100;
+        constant_speed_distance = abs(units) - acceleration_distance - deceleration_distance;
+        if (constant_speed_distance < 0) constant_speed_distance = 0;
+    }
+
+    // Gradual acceleration
+    while (abs(get_motor_position_counter(wheels.frontLeft)) < acceleration_distance) {
+        currentSpeed = (int)(((float)abs(get_motor_position_counter(wheels.frontLeft)) / acceleration_distance) * maxSpeed);
+        if (currentSpeed > maxSpeed) currentSpeed = maxSpeed;
+        if (currentSpeed < 50 && abs(get_motor_position_counter(wheels.frontLeft)) > 0) currentSpeed = 50; // Ensure minimum speed
+
+        mav(wheels.frontLeft, currentSpeed);
+        mav(wheels.backLeft, -currentSpeed);
+        mav(wheels.frontRight, -currentSpeed);
+        mav(wheels.backRight, currentSpeed);
+        msleep(10);
+    }
+
+    // Drive at max speed
+    while (abs(get_motor_position_counter(wheels.frontLeft)) < acceleration_distance + constant_speed_distance) {
+        mav(wheels.frontLeft, maxSpeed);
+        mav(wheels.backLeft, -maxSpeed);
+        mav(wheels.frontRight, -maxSpeed);
+        mav(wheels.backRight, maxSpeed);
+        msleep(10);
+    }
+
+    // Gradual deceleration
+    while (abs(get_motor_position_counter(wheels.frontLeft)) < abs(units)) {
+        int distance_into_deceleration = abs(get_motor_position_counter(wheels.frontLeft)) - (abs(units) - deceleration_distance);
+        currentSpeed = maxSpeed - (int)(((float)distance_into_deceleration / deceleration_distance) * maxSpeed);
+        if (currentSpeed < 0) currentSpeed = 0;
+        if (currentSpeed < 50 && abs(get_motor_position_counter(wheels.frontLeft)) < abs(units)) currentSpeed = 50; // Ensure minimum speed
+
+        mav(wheels.frontLeft, currentSpeed);
+        mav(wheels.backLeft, -currentSpeed);
+        mav(wheels.frontRight, -currentSpeed);
+        mav(wheels.backRight, currentSpeed);
+        msleep(10);
+    }
+
+    // Stop the motors
+    ao();
+    return;
 }
 
-void rotate(int degrees, int speed) {
-    move_relative_position(wheels.frontLeft, -speed / 4, -5 * DEGREES_TO_TICKS);
-    move_relative_position(wheels.backLeft, -speed / 4, -5 * DEGREES_TO_TICKS);
-    move_relative_position(wheels.frontRight, speed / 4, 5 * DEGREES_TO_TICKS);
-    move_relative_position(wheels.backRight, speed / 4, 5 * DEGREES_TO_TICKS);
-    while (get_motor_done(wheels.frontLeft) == 0 && get_motor_done(wheels.frontRight) == 0 && get_motor_done(wheels.backLeft) == 0 && get_motor_done(wheels.backRight) == 0) {
+void rotate(int degrees, int maxSpeed) {
+    int units = (int)(degrees * DEGREES_TO_TICKS);
+
+    // Clear motor position counters
+    clear_motor_position_counter(wheels.frontLeft);
+    clear_motor_position_counter(wheels.backLeft);
+    clear_motor_position_counter(wheels.frontRight);
+    clear_motor_position_counter(wheels.backRight);
+
+    int currentSpeed = 0;
+    int acceleration_distance = abs(units) * 0.15; // 15% of distance for acceleration
+    int deceleration_distance = abs(units) * 0.15; // 15% of distance for deceleration
+    int constant_speed_distance = abs(units) - acceleration_distance - deceleration_distance;
+
+    // Adjust distances for very short rotations
+    if (abs(units) < 200) { // For shorter distances, use a fixed smaller acceleration/deceleration distance
+        acceleration_distance = abs(units) / 3;
+        deceleration_distance = abs(units) / 3;
+        constant_speed_distance = abs(units) - acceleration_distance - deceleration_distance;
+        if (constant_speed_distance < 0) constant_speed_distance = 0;
+    } else { // For longer distances, ensure minimum acceleration/deceleration distance
+        if (acceleration_distance < 100) acceleration_distance = 100;
+        if (deceleration_distance < 100) deceleration_distance = 100;
+        constant_speed_distance = abs(units) - acceleration_distance - deceleration_distance;
+        if (constant_speed_distance < 0) constant_speed_distance = 0;
+    }
+
+    int direction = (units > 0) ? 1 : -1;
+
+    // Gradual acceleration
+    while (abs(get_motor_position_counter(wheels.frontLeft)) < acceleration_distance) {
+        currentSpeed = (int)(((float)abs(get_motor_position_counter(wheels.frontLeft)) / acceleration_distance) * maxSpeed);
+        if (currentSpeed > maxSpeed) currentSpeed = maxSpeed;
+        if (currentSpeed < 50 && abs(get_motor_position_counter(wheels.frontLeft)) > 0) currentSpeed = 50; // Ensure minimum speed
+
+        mav(wheels.frontLeft, direction * currentSpeed);
+        mav(wheels.backLeft, direction * currentSpeed);
+        mav(wheels.frontRight, -direction * currentSpeed);
+        mav(wheels.backRight, -direction * currentSpeed);
         msleep(10);
     }
-    move_relative_position(wheels.frontLeft, speed, degrees - (15 * DEGREES_TO_TICKS));
-    move_relative_position(wheels.backLeft, speed, degrees - (15 * DEGREES_TO_TICKS));
-    move_relative_position(wheels.frontRight, (-1) * speed, (-1) * degrees + (15 * DEGREES_TO_TICKS));
-    move_relative_position(wheels.backRight, (-1) * speed, (-1) * degrees + (15 * DEGREES_TO_TICKS));
-    while (get_motor_done(wheels.frontLeft) == 0 && get_motor_done(wheels.frontRight) == 0 && get_motor_done(wheels.backLeft) == 0 && get_motor_done(wheels.backRight) == 0) {
+
+    // Drive at max speed
+    while (abs(get_motor_position_counter(wheels.frontLeft)) < acceleration_distance + constant_speed_distance) {
+        mav(wheels.frontLeft, direction * maxSpeed);
+        mav(wheels.backLeft, direction * maxSpeed);
+        mav(wheels.frontRight, -direction * maxSpeed);
+        mav(wheels.backRight, -direction * maxSpeed);
         msleep(10);
     }
-    move_relative_position(wheels.frontLeft, speed / 2, (10 * DEGREES_TO_TICKS));
-    move_relative_position(wheels.backLeft, speed / 2, (10 * DEGREES_TO_TICKS));
-    move_relative_position(wheels.frontRight, (-1) * speed / 2, -(10 * DEGREES_TO_TICKS));
-    move_relative_position(wheels.backRight, (-1) * speed / 2, -(10 * DEGREES_TO_TICKS));
-    
-    mav(wheels.frontLeft, (-1) * speed);
-    mav(wheels.backLeft, (-1) * speed);
-    mav(wheels.frontRight, speed);
-    mav(wheels.backRight, speed);
-    msleep(50);
-    ao();
+
+    // Gradual deceleration
+    while (abs(get_motor_position_counter(wheels.frontLeft)) < abs(units)) {
+        int distance_into_deceleration = abs(get_motor_position_counter(wheels.frontLeft)) - (abs(units) - deceleration_distance);
+        currentSpeed = maxSpeed - (int)(((float)distance_into_deceleration / deceleration_distance) * maxSpeed);
+        if (currentSpeed < 0) currentSpeed = 0;
+        if (currentSpeed < 50 && abs(get_motor_position_counter(wheels.frontLeft)) < abs(units)) currentSpeed = 50; // Ensure minimum speed
+
+        mav(wheels.frontLeft, direction * currentSpeed);
+        mav(wheels.backLeft, direction * currentSpeed);
+        mav(wheels.frontRight, -direction * currentSpeed);
+        mav(wheels.backRight, -direction * currentSpeed);
+        msleep(10);
+    }
+
+    // Stop the motors
+    rotateStop(maxSpeed); // Use the rotateStop function
     return;
 }
 
