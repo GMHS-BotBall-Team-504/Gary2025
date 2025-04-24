@@ -203,31 +203,7 @@ void turnLeft(const char *params) {
     int speed, degrees;
     if (sscanf(params, "%d %d", &speed, &degrees) == 2) {
         if (speed > 0 && degrees > 0) {
-            move_relative_position(wheels.frontLeft, speed / 4, 5 * DEGREES_TO_TICKS);
-            move_relative_position(wheels.backLeft, speed / 4, 5 * DEGREES_TO_TICKS);
-            move_relative_position(wheels.frontRight, -speed / 4, -5 * DEGREES_TO_TICKS);
-            move_relative_position(wheels.backRight, -speed / 4, -5 * DEGREES_TO_TICKS);
-            while (get_motor_done(wheels.frontLeft) == 0 && get_motor_done(wheels.frontRight) == 0 && get_motor_done(wheels.backLeft) == 0 && get_motor_done(wheels.backRight) == 0) {
-                msleep(10);
-            }
-            move_relative_position(wheels.frontLeft, speed, DEGREES_TO_TICKS * degrees * 1.25 - (15 * DEGREES_TO_TICKS));
-            move_relative_position(wheels.backLeft, speed, DEGREES_TO_TICKS * degrees * 1.25 - (15 * DEGREES_TO_TICKS));
-            move_relative_position(wheels.frontRight, (-1) * speed, (-1) * DEGREES_TO_TICKS * degrees * 1.25 + (15 * DEGREES_TO_TICKS));
-            move_relative_position(wheels.backRight, (-1) * speed, (-1) * DEGREES_TO_TICKS * degrees * 1.25 + (15 * DEGREES_TO_TICKS));
-            while (get_motor_done(wheels.frontLeft) == 0 && get_motor_done(wheels.frontRight) == 0 && get_motor_done(wheels.backLeft) == 0 && get_motor_done(wheels.backRight) == 0) {
-                msleep(10);
-            }
-            move_relative_position(wheels.frontLeft, speed / 2, (10 * DEGREES_TO_TICKS));
-            move_relative_position(wheels.backLeft, speed / 2, (10 * DEGREES_TO_TICKS));
-            move_relative_position(wheels.frontRight, (-1) * speed / 2, -(10 * DEGREES_TO_TICKS));
-            move_relative_position(wheels.backRight, (-1) * speed / 2, -(10 * DEGREES_TO_TICKS));
-            
-            mav(wheels.frontLeft, (-1) * speed);
-            mav(wheels.backLeft, (-1) * speed);
-            mav(wheels.frontRight, speed);
-            mav(wheels.backRight, speed);
-            msleep(50);
-            ao();
+            rotate(DEGREES_TO_TICKS * degrees * 1.085, speed);
             printf("Turned left %d degrees at speed %d.\n", degrees, speed);
         } else {
             printf("Invalid parameters for turn_left. Usage: turn_left <speed> <degrees>\n");
