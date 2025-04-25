@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <math.h>
 #include <time.h>
+#include <limits.h>
 #include <kipr/wombat.h>
 
 #define TAPE_THRESHOLD 1500
@@ -79,7 +80,7 @@ const Command commandTable[] = {
     {"pvcPos", pvcArm},
     {"pvc", pvcArm}, // Alias for pvcPos
     {"potatoPos", potatoArm},
-    {"pp", potatoArm}, // Alias for potatoPos
+    {"pp", potatoArm},   // Alias for potatoPos
     {"groundPos", groundArm},
     {"gp", groundArm}, // Alias for groundPos
     {"openPos", openPos},
@@ -107,16 +108,31 @@ int main() {
     char input[MAX_COMMAND_LENGTH];
     char command[50];
     char params[MAX_COMMAND_LENGTH - 50];
-    FILE *inputFile = fopen("values.txt", "r"); // Attempt to open values.txt
-
-    displayWelcomeHeader();
+    FILE *inputFile = fopen("values.txt", "r"); // Attempt to open values.txt from current directory
 
     if (inputFile == NULL) {
-        printf(YELLOW_COLOR "Could not open values.txt. Reading from standard input.\n" RESET_COLOR);
-        inputFile = stdin; // Fallback to stdin if file opening fails
+        printf(YELLOW_COLOR "Could not open values.txt in current directory. Attempting absolute path...\n" RESET_COLOR);
+        inputFile = fopen("/home/kipr/Documents/KISS/test/hmm/bin/values.txt", "r"); // Attempt to open from absolute path
+
+        if (inputFile == NULL) {
+            printf(RED_COLOR "Could not open values.txt from either path. Reading from standard input.\n" RESET_COLOR);
+            char cwd[PATH_MAX];
+            if (getcwd(cwd, sizeof(cwd)) != NULL) {
+                printf("Current working directory: %s\n", cwd);
+            } else {
+                perror("getcwd() error");
+                return 1;
+            }
+            inputFile = stdin; // Fallback to stdin if file opening fails
+        } else {
+            printf(GREEN_COLOR "Reading commands from /home/kipr/Documents/KISS/test/hmm/bin/values.txt\n" RESET_COLOR);
+        }
     } else {
-        printf(GREEN_COLOR "Reading commands from values.txt\n" RESET_COLOR);
+        printf(GREEN_COLOR "Reading commands from values.txt in current directory\n" RESET_COLOR);
     }
+
+    // wait_for_light(analogPorts.startLight);
+    // shut_down_in(118);
 
     while (1) {
         if (inputFile == stdin) {
@@ -203,7 +219,7 @@ void turnLeft(const char *params) {
     int speed, degrees;
     if (sscanf(params, "%d %d", &speed, &degrees) == 2) {
         if (speed > 0 && degrees > 0) {
-            rotate(DEGREES_TO_TICKS * degrees * 1.085, speed);
+            rotate(DEGREES_TO_TICKS * degrees * 184/160, speed);
             printf("Turned left %d degrees at speed %d.\n", degrees, speed);
         } else {
             printf("Invalid parameters for turn_left. Usage: turn_left <speed> <degrees>\n");
@@ -333,16 +349,18 @@ void newServoPos(const char *params) {
 
 void strafeArm(const char *params) {
     // No parameters needed for this command
-    runServoThreads((ServoParams[]){
-            {servos.shoulder, shoulderPos.strafe, 2},
-            {servos.elbow, 0, 1},
-            {servos.wrist, wristPos.strafe, 2}},
-        3);
-    msleep(1700);
-    runServoThreads((ServoParams[]){
-                        {servos.shoulder, shoulderPos.strafe, 2},
-                        {servos.elbow, elbowPos.strafe, 2}},
-                    2);
+    for (int i = 0; i < 2; i++) {
+        runServoThreads((ServoParams[]){
+                            {servos.shoulder, shoulderPos.strafe, 1},
+                            {servos.elbow, 0, 1},
+                            {servos.wrist, wristPos.strafe, 2}},
+                        3);
+        msleep(1250);
+        runServoThreads((ServoParams[]){
+                            {servos.shoulder, shoulderPos.strafe, 1},
+                            {servos.elbow, elbowPos.strafe, 2}},
+                        2);
+    }
     printf("Strafe arm position.\n");
     return;
 }
@@ -370,6 +388,12 @@ void potatoArm(const char *params) {
 }
 
 void groundArm(const char *params) {
+    runServoThreads((ServoParams[]) {
+        {servos.shoulder, shoulderPos.ground, 2},
+        {servos.elbow, elbowPos.perpendicularToShoulder, 2},
+        {servos.wrist, wristPos.ground, 2},
+    }, 3);
+    msleep(1000);
     runServoThreads((ServoParams[]) {
         {servos.shoulder, shoulderPos.ground, 2},
         {servos.elbow, elbowPos.ground, 2},

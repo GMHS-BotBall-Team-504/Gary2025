@@ -15,8 +15,8 @@ SRC_DIR="$BASE_DIR/src"
 EXECUTABLES=("manual" "auto")
 SRC_FILES=(
     # "src/main.c src/ports.c src/positions.c src/servos.c src/tasks.c src/threads.c src/translation.c"
-    "src/manual.c src/ports.c src/positions.c src/servos.c src/tasks.c src/threads.c src/translation.c"
-    "src/auto.c src/ports.c src/positions.c src/servos.c src/tasks.c src/threads.c src/translation.c"
+    "src/manual.c src/ports.c src/positions.c src/servos.c src/tasks.c src/translation.c"
+    "src/auto.c src/ports.c src/positions.c src/servos.c src/tasks.c src/translation.c"
 )
 
 cd "$BASE_DIR/.."
@@ -46,7 +46,7 @@ for ((i=0; i<${#EXECUTABLES[@]}; i++)); do
     sudo docker run -it --rm --user "$(id -u):$(id -g)" \
         --volume "$(pwd)/scripts/out/build:/home/kipr:rw" \
         sillyfreak/wombat-cross aarch64-linux-gnu-gcc -g -Wall -pthread  \
-        $SOURCE_FILES -lkipr -lm -o $EXECUTABLE
+        $SOURCE_FILES src/_init_helper.c -lkipr -lm -o $EXECUTABLE
     echo ""
 done
 
@@ -61,6 +61,13 @@ sshpass -p "$KIPR_ROBOT_PASS" scp \
 sshpass -p "$KIPR_ROBOT_PASS" scp \
     "scripts/values.txt" \
     "$KIPR_ROBOT_USER@$KIPR_ROBOT_IP:$DEPLOY_DIR"
+
+sudo mv "scripts/out/build/manual" "scripts/out/build/botball_user_program"
+
+sshpass -p "$KIPR_ROBOT_PASS" scp \
+    "scripts/values.txt" "scripts/out/build/botball_user_program" \
+    "$KIPR_ROBOT_USER@$KIPR_ROBOT_IP:/home/kipr/Documents/KISS/test/hmm/bin/"
+
 
 sleep 0.1
 

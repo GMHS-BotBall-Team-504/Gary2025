@@ -1,4 +1,5 @@
 #include "../include/library.h"
+#include "../"
 #include <stdio.h>
 #include <kipr/wombat.h>
 

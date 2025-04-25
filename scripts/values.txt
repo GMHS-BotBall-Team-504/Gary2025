@@ -1,11 +1,13 @@
+strafePos
+groundPos
 closePos
 strafePos
 driveForward 1000 0.5
 driveDirection 90 10 1500
 driveForward 1500 1
-turnLeft 150 176
+turnLeft 850 176
 driveDirection -90 5 1500
-driveBackwards 1500 2
+driveBackward 1500 2
 openPos
 groundPos
 driveForward 1500 3
@@ -22,3 +24,4 @@ driveForward 1500 0.5
 driveDirection -90 5 1500
 driveForward 1000 2
 groundPos
+exit

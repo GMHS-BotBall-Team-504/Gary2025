@@ -12,9 +12,9 @@ DEPLOY_DIR="/home/kipr/comp"
 SRC_DIR="$BASE_DIR/src" 
 
 # Array of executables to build
-EXECUTABLES=("main")
+EXECUTABLES=("manual")
 SRC_FILES=(
-    "src/main.c src/ports.c src/positions.c src/servos.c src/tasks.c src/threads.c src/translation.c"
+    "src/manual.c src/ports.c src/positions.c src/servos.c src/tasks.c src/translation.c"
 
 )
 cd "$BASE_DIR/.."
