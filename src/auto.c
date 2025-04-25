@@ -8,7 +8,7 @@
 #define TAPE_THRESHOLD 1500
 #define DEGREES_TO_TICKS 9.013888889
 #define STRAFE_CM_TO_TICKS 143.614670791
-#define STRAIGHT_CM_TO_TICKS 130.0000
+#define STRAIGHT_CM_TO_TICKS 232.216295546
 #define MAX_COMMAND_LENGTH 100
 
 #define RESET_COLOR "\033[0m"
@@ -225,31 +225,49 @@ void turnLeft(const char *params) {
     return;
 }
 
+// void driveForward(const char *params) {
+//     for (int i = 0; i < 4; i++) {
+//         cmpc(i);
+//     }
+//     int speed = atoi(params);
+//     mav(wheels.frontLeft, speed);
+//     mav(wheels.backLeft, speed);
+//     mav(wheels.frontRight, speed);
+//     mav(wheels.backRight, speed);
+//     char input;
+//     int distance;
+//     while (1) {
+//         if (read(STDIN_FILENO, &input, 1) == 1) {
+//             if (input == '\n') {
+//                 break; // Exit the loop on Enter key
+//             }
+//         }
+//         msleep(10);
+//     }
+//     printf("Stopping forward drive.\n");
+//     distance = (int)(get_motor_position_counter(wheels.frontLeft));
+//     stop(speed);
+//     printf("Drove forward %d ticks at speed %d.\n", abs(distance), speed);
+//     printf("-------------------------------\n");
+//     return;
+// }
+
 void driveForward(const char *params) {
-    for (int i = 0; i < 4; i++) {
-        cmpc(i);
-    }
-    int speed = atoi(params);
-    mav(wheels.frontLeft, speed);
-    mav(wheels.backLeft, speed);
-    mav(wheels.frontRight, speed);
-    mav(wheels.backRight, speed);
-    char input;
-    int distance;
-    while (1) {
-        if (read(STDIN_FILENO, &input, 1) == 1) {
-            if (input == '\n') {
-                break; // Exit the loop on Enter key
-            }
+    int speed;
+    float distance;
+    if (sscanf(params, "%d %f", &speed, &distance) == 2)
+    {
+        if (speed > 0 && distance > 0) {
+            forwardDrive(distance * STRAIGHT_CM_TO_TICKS, speed);
+            printf("Drove forward %f inches at speed %d.\n", distance, speed);
+        } else {
+            printf("Invalid parameters for drive_forward.\nUsage: drive_forward <speed> <distance>\n");
         }
-        msleep(10);
     }
-    printf("Stopping forward drive.\n");
-    distance = (int)(get_motor_position_counter(wheels.frontLeft));
-    stop(speed);
-    printf("Drove forward %d ticks at speed %d.\n", abs(distance), speed);
-    printf("-------------------------------\n");
-    return;
+    else
+    {
+        printf("Invalid parameters for drive_forward.\nUsage: drive_forward <speed> <distance>\n");
+    }
 }
 
 void driveBackward(const char *params) {
@@ -396,7 +414,7 @@ void strafeArm(const char *params) {
         {servos.elbow, 100, 1},
         {servos.wrist, wristPos.strafe, 2}},
     3);
-    msleep(1700);
+    msleep(1500);
     runServoThreads((ServoParams[]){
                         {servos.shoulder, shoulderPos.strafe, 2},
                         {servos.elbow, elbowPos.strafe, 2}},
@@ -428,6 +446,12 @@ void potatoArm(const char *params) {
 }
 
 void groundArm(const char *params) {
+    runServoThreads((ServoParams[]) {
+        {servos.shoulder, shoulderPos.ground, 2},
+        {servos.elbow, elbowPos.perpendicularToShoulder, 2},
+        {servos.wrist, wristPos.ground, 2},
+    }, 3);
+    msleep(1000);
     runServoThreads((ServoParams[]) {
         {servos.shoulder, shoulderPos.ground, 2},
         {servos.elbow, elbowPos.ground, 2},

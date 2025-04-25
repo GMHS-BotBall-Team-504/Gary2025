@@ -7,11 +7,11 @@ void crash(int backLeft, int backRight, int frontLeft, int frontRight);
 void alignRotation(int direction, int ticksPerSecond);
 void alignBack(int ticksPerSecond);
 
-void forwardDrive(int units, int speed);
-void backwardDrive(int units, int speed);
-void rightDrive(int units, int speed);
-void leftDrive(int units, int speed);
-void rotate(int degrees, int speed);
+void forwardDrive(int units, int maxSpeed);
+void backwardDrive(int units, int maxSpeed);
+void rightDrive(int units, int maxSpeed);
+void leftDrive(int units, int maxSpeed);
+void rotate(int degrees, int maxSpeed);
 // void turnRight(int speed, int degrees);
 // void turnLeft(int speed, int degrees);
 void stop(int motorSpeed);
